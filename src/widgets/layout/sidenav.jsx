@@ -82,7 +82,7 @@ export function Sidenav({ brandImg, brandName, routes }) {
                           ? "white"
                           : sidenavType === "dark"
                           ? "white"
-                          : "blue-gray"
+                          : "white"
                       }
                       className="flex items-center gap-4 px-4 capitalize"
                       fullWidth
