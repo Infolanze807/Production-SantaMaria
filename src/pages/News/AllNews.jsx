@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import { FaRegStar } from "react-icons/fa";
 
 function AllNews() {
 
@@ -47,7 +48,7 @@ function AllNews() {
               <img src={news.image} alt={news.title} className="h-full w-full object-cover" />
             </div>
             <div className="p-6 py-0 px-1">
-              <h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-blue-gray-900 mt-1 mb-2">{news.title}</h5>
+              <div className='flex items-center justify-between'><h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-blue-gray-900 mt-1 mb-2">{news.title}</h5><FaRegStar /></div>
               <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-500">{news.text}</p>
             <div className='text-sm text-blue-gray-500 pt-3'>Date: {news.date}</div>
             </div>
@@ -78,6 +79,10 @@ function AllNews() {
         <div className='mb-5'>
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">Upload Image</label>
         <input class="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
+        </div>
+        <div class="flex items-center mb-5">
+            <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+            <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Show on top</label>
         </div>
             <div className="flex justify-between mt-4">
               <button type='submit' className="bg-green-500 text-white px-4 py-2 rounded mr-4" onClick={handleUpdateClick}>Update</button>

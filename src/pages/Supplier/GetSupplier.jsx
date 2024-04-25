@@ -42,7 +42,7 @@ function GetSupplier() {
                             <img className='-z-10 w-full object-cover rounded-lg' src={supplier.cover_img} alt="" />
                         </div>
                         <div className=''>
-                            <img className='absolute w-24 h-24 rounded-full object-cover left-6 top-0' src={supplier.profile_img} alt="" />
+                            <img className='absolute border-4 border-white w-24 h-24 rounded-full object-cover left-6 top-0' src={supplier.profile_img} alt="" />
                         </div>
                     </div>
                     <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed'>
