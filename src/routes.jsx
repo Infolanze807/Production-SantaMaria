@@ -6,7 +6,7 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Home, Events, News, Company } from "@/pages/dashboard";
+import { Events, News, Company } from "@/pages/dashboard";
 import { SignIn } from "@/pages/auth";
 import Supplier from "./pages/dashboard/Supplier";
 import { HiBuildingOffice } from "react-icons/hi2";
@@ -19,6 +19,7 @@ import { IoLogoFirebase } from "react-icons/io5";
 import { BiSolidComponent } from "react-icons/bi";
 import { MdDiscount } from "react-icons/md";
 import { PiFlagBannerFill } from "react-icons/pi";
+import Home from "./pages/dashboard/Home";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
