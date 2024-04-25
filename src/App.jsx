@@ -6,7 +6,7 @@ function App() {
   return (
     <Routes>
       <Route path="/dashboard/*" element={<Dashboard />} />
-      <Route path="/auth/*" element={<Auth />} />
+      {/* <Route path="/auth/*" element={<Auth />} /> */}
       <Route path="/sign-up" element={<SignUp />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
