@@ -15,8 +15,8 @@ export function Sidenav({ brandImg, brandName, routes }) {
   const { sidenavType, openSidenav } = controller;
   const sidenavTypes = {
     dark: "bg-gradient-to-br from-gray-800 to-gray-900",
-    white: "bg-white shadow-sm",
-    transparent: "bg-transparent",
+    // white: "bg-white shadow-sm",
+    // transparent: "bg-transparent",
   };
 
   controller.sidenavColor = "dark";
@@ -109,8 +109,6 @@ export function Sidenav({ brandImg, brandName, routes }) {
 Sidenav.defaultProps = {
   brandImg: "/img/logo-ct.png",
   brandName: "Santa Maria",
-  sidenavColor: "dark",
-  sidenavType: "dark",
 };
 
 Sidenav.propTypes = {
