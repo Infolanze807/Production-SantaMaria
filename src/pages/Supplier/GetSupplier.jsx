@@ -45,13 +45,13 @@ function GetSupplier() {
                             <img className='absolute border-4 border-white w-24 h-24 rounded-full object-cover left-6 top-0' src={supplier.profile_img} alt="" />
                         </div>
                     </div>
-                    <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed'>
+                    <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
                         <div>Name: &nbsp;<span className='font-normal'>{supplier.name}</span></div>
                         <div>Bio: &nbsp;<span className='font-normal'>{supplier.bio}</span></div>
                         <div>Number: &nbsp;<span className='font-normal'>{supplier.number}</span></div>
                         <div>Service: &nbsp;<span className='font-normal'>{supplier.service}</span></div>
                     </div>
-                    <div className='lg:flex lg:flex-col mx-auto gap-2'>
+                    <div className='lg:flex lg:flex-col mx-auto pt-4 lg:pt-0 gap-2'>
                         <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(supplier)}>View</button>
                         <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white">Delete</button>
                     </div>
