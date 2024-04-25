@@ -110,6 +110,7 @@ Sidenav.defaultProps = {
   brandImg: "/img/logo-ct.png",
   brandName: "Santa Maria",
   sidenavColor: "dark",
+  sidenavType: "dark",
 };
 
 Sidenav.propTypes = {
