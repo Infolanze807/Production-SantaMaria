@@ -28,7 +28,7 @@ function AllUser() {
       ];
 
   return (
-    <div className="">
+    <div className="mb-6">
       <div className="bg-clip-border rounded-xl bg-white text-gray-700 border border-blue-gray-100 shadow-sm">
         <div className="p-6">
           <div className="flex items-center justify-between bg-[--main-color] p-3 py-4 rounded-lg">
