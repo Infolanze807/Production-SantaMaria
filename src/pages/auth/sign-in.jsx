@@ -17,7 +17,7 @@ export function SignIn() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}admin/login`, {
+      const response = await axios.post(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/login`, {
         email,
         password
       });      
@@ -70,6 +70,7 @@ export function SignIn() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+        {error && <div className="text-red-600">{error}</div>}
           <Checkbox
             label={
               <Typography
@@ -103,7 +104,6 @@ export function SignIn() {
             </Typography>
           </div>
         </form>
-        {error && <div className="text-red-600">{error}</div>}
       </div>
       <div className="w-2/6 h-full hidden lg:block">
         <img
