@@ -35,7 +35,7 @@ function AddBanner() {
         setDescription('');
         setImage(null)
         // Optionally, alert the user
-        window.alert('Company added successfully.');
+        window.alert('Banner added successfully.');
     }
       console.log(response.data);
     } catch (error) {

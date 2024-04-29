@@ -54,7 +54,7 @@ function AddComponent() {
         });
      
         // Optionally, alert the user
-        window.alert('Company added successfully.');
+        window.alert('Component added successfully.');
     }
       console.log(response.data);
 

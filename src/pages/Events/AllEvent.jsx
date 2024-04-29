@@ -75,7 +75,7 @@ function AllEvent() {
           window.alert("Event deleted successfully.");
         }
       } catch (error) {
-        console.error('Error deleting company:', error);
+        console.error('Error deleting Event:', error);
         console.error('Error response from server:', error.response?.data); // Log the response data directly
     }
       console.log("Item deleted");  // This would be replaced with actual deletion logic

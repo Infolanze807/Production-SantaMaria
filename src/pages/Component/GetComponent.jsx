@@ -73,10 +73,10 @@ function GetComponent() {
       });
       if (response.status === 200) {
         fetchComponentData()
-        window.alert("Company deleted successfully.");
+        window.alert("Component deleted successfully.");
     } 
   } catch (error) {
-    console.error('Error deleting company:', error);
+    console.error('Error deleting Component:', error);
     console.error('Error response from server:', error.response?.data); // Log the response data directly
 }
   console.log("Item deleted");  // This would be replaced with actual deletion logic
