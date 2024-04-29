@@ -1,27 +1,39 @@
 import React from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
+import axios from "axios";
 
-function UserRequest() {
-  const requests = [
-    {
-      first_name: "Jone",
-      last_name: "Deo",
-      email: "jone@gmail.com",
-      date_of_birth: "22/09/2001",
-    },
-    {
-      first_name: "Spider",
-      last_name: "Maxwell",
-      email: "spider@gmail.com",
-      date_of_birth: "30/04/2005",
-    },
-    {
-      first_name: "Michle",
-      last_name: "Deo",
-      email: "micher@gmail.com",
-      date_of_birth: "20/04/2025",
-    },
-  ];
+function UserRequest({users,onDataChange}) {
+  const handleApprove = async(user) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+          throw new Error('No token found. Please login again.');
+      }
+
+      const base64EncodedIdObject = btoa(JSON.stringify({
+        "iv": user.id.iv,
+        "encryptedData": user.id.encryptedData
+    }));
+  
+      const url = `http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/user/approvedLogin/${base64EncodedIdObject}`;
+     const response =  await axios.put(url, 
+     {"status": 1},
+     { headers: {
+      Authorization: `Bearer ${token}`
+          }
+      });
+      console.log(response)
+      if (response.status === 200) {
+          
+          window.alert("User Approved successfully.");
+           onDataChange();  
+        
+      }   
+  } catch (error) {
+      window.alert("Error deleting company:",error)
+      console.error('Error deleting company:', error);   
+  }
+  }
 
   return (
     <div className="mb-6">
@@ -38,16 +50,21 @@ function UserRequest() {
           <table className="w-full min-w-[640px] table-auto">
             <thead className="">
               <tr>
+              <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                  <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
+                    No.
+                  </p>
+                </th>
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     First Name
                   </p>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                {/* <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     Last Name
                   </p>
-                </th>
+                </th> */}
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     Email
@@ -58,6 +75,16 @@ function UserRequest() {
                     Date Of Birth
                   </p>
                 </th>
+                <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                  <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
+                   Bio
+                  </p>
+                </th>
+                <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                  <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
+                    Location
+                  </p>
+                </th>
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-center">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     Action
@@ -66,22 +93,32 @@ function UserRequest() {
               </tr>
             </thead>
             <tbody>
-              {requests.map((request, index) => (
+              {users.map((user, index) => (
                 <tr key={index}>
+                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-blue-gray-900 font-bold">
+                    {index+1}
+                  </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-blue-gray-900 font-bold">
-                    {request.first_name}
+                    {user.firstName}
+                  </td>
+                  {/* <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
+                    {user.lastName}
+                  </td> */}
+                  <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
+                    {user.email}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {request.last_name}
+                    {user.dob}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {request.email}
+                    {user.bio}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {request.date_of_birth}
+                    {user.location}
                   </td>
+
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-center">
-                    <button className="bg-green-500 px-5 p-2 rounded-full text-white lg:me-5 lg:mb-0 mb-3">
+                    <button className="bg-green-500 px-5 p-2 rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleApprove(user)}>
                       Accept
                     </button>
                     <button className="bg-red-500 px-5 p-2 rounded-full text-white">

@@ -1,7 +1,7 @@
 import React from 'react'
 import { HiOutlineDotsVertical } from "react-icons/hi";
 
-function AllUser() {
+function AllUser({users}) {
 
     const requests = [
         {
@@ -42,16 +42,21 @@ function AllUser() {
           <table className="w-full min-w-[640px] table-auto">
             <thead className="">
               <tr>
+              <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                  <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
+                   No.
+                  </p>
+                </th>
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     First Name
                   </p>
                 </th>
-                <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                {/* <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     Last Name
                   </p>
-                </th>
+                </th> */}
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     Email
@@ -64,25 +69,36 @@ function AllUser() {
                 </th>
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
+                   Bio
+                  </p>
+                </th>
+                <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                  <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
                     Location
                   </p>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {requests.map((request, index) => (
+              {users.map((request, index) => (
                 <tr key={index}>
+                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-blue-gray-900 font-bold">
+                    {index+1}
+                  </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-blue-gray-900 font-bold">
-                    {request.first_name}
+                    {request.firstName}
                   </td>
-                  <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {request.last_name}
-                  </td>
+                  {/* <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
+                    {request.lastName}
+                  </td> */}
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
                     {request.email}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {request.date_of_birth}
+                    {request.dob}
+                  </td>
+                  <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
+                    {request.bio}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm ">
                     {request.location}

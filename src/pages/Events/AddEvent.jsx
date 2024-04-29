@@ -1,35 +1,99 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 function AddEvent() {
+  const [eventTitle, setEventTitle] = useState('');
+  const [eventType, setEventType] = useState('Event');
+  const [eventContent, setEventContent] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [eventImage, setEventImage] = useState(null);
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [error, setError] = useState('');
+  const [token, setToken] = useState('');
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem('token');
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
+      formData.append('title', eventTitle);
+      formData.append('type', eventType);
+      formData.append('content', eventContent);
+      formData.append('published_date', eventDate);
+      formData.append('image', eventImage);
+      formData.append('isFeatured', isFeatured);
+
+        console.log(eventType)
+      const response = await axios.post('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.status === 201) {
+        // Clear form fields
+        setEventTitle('');
+        setEventType('Event');
+        setEventContent('');
+        setEventDate('');
+        setEventImage(null);
+        setIsFeatured(false);
+        setError('');
+        // Optionally, alert the user
+        window.alert('Event added successfully.');
+      }
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error adding event:', error);
+      setError('Error adding event. Please try again.');
+      window.alert('Error adding event. Please try again.');
+    }
+  };
+
   return (
     <div className='p-4 py-8 mb-7 bg-[--main-color] bg-clip-border rounded-xl'>
-        <form class="max-w-xl mx-auto">
-        <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Title</label>
-            <input type="text" id="text" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="lorem ipsum" required />
+      <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
+        <div className="mb-5">
+          <label htmlFor="eventTitle" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Title</label>
+          <input type="text" id="eventTitle" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Title..." value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
         </div>
-        <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Discription</label>
-            <textarea placeholder='Lorem ipsum dolor sit...' type="text" id="text" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+        <div className="mb-5">
+          <label htmlFor="eventType" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Type</label>
+          <select id="eventType" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventType} onChange={(e) => setEventType(e.target.value)} required>
+            <option value="Event">Event</option>
+            {/* <option value="News">News</option> */}
+          </select>
         </div>
-        <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Date</label>
-            <input placeholder='Date...' type="text" id="text" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+        <div className="mb-5">
+          <label htmlFor="eventContent" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Description</label>
+          <textarea placeholder='Event Description...' id="eventContent" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventContent} onChange={(e) => setEventContent(e.target.value)} required />
+        </div>
+        <div className="mb-5">
+          <label htmlFor="eventDate" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Date</label>
+          <input placeholder='Event Date...' type="text" id="eventDate" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventDate} onChange={(e) => setEventDate(e.target.value)} required />
         </div>
         <div className='mb-5'>
-        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">Upload Image</label>
-        <input class="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
+          <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="eventImage">Upload Image</label>
+          <input className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="eventImage_help" id="eventImage" type="file" onChange={(e) => setEventImage(e.target.files[0])} required />
         </div>
-        <div class="flex items-center mb-5">
-            <input id="default-checkbox" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-            <label for="default-checkbox" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Show on top</label>
+        <div className="flex items-center mb-5">
+          <input id="isFeatured" type="checkbox" checked={isFeatured} onChange={(e) => setIsFeatured(e.target.checked)} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+          <label htmlFor="isFeatured" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Show on top</label>
         </div>
         <div className=''>
-        <button type="submit" class="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
-            </div>
-        </form>
+          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
+        </div>
+        {/* Display error message if there's an error */}
+        {error && <div className="text-red-600">{error}</div>}
+      </form>
     </div>
-  )
+  );
 }
 
-export default AddEvent
+export default AddEvent;

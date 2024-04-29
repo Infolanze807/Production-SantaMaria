@@ -89,12 +89,12 @@ export function SignIn() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          {/* <Button className="mt-6" fullWidth type="submit">
+          <Button className="mt-6" fullWidth type="submit">
             Sign In
-          </Button> */}
-          <Link to="/dashboard/home" className="mt-6"><Button className="mt-6" fullWidth>
+          </Button>
+          {/* <Link to="/dashboard/home" className="mt-6"><Button className="mt-6" fullWidth>
             Sign In
-          </Button></Link>
+          </Button></Link> */}
 
           <div className="flex items-center justify-between gap-2 mt-6">
             <Typography variant="small" className="font-medium text-gray-900">
