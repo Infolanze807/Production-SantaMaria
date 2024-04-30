@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
 
 function GetCompany() {
+    const [apiResponse, setApiResponse] = useState(null);
     const [companyData, setCompanyData] = useState([]);
     const [selectedCompany, setSelectedCompany] = useState(null);
     const [formData, setFormData] = useState({
@@ -20,6 +21,8 @@ function GetCompany() {
     const [loading, setLoading] = useState(false);
 
     
+  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=1`
+
     const fetchCompanyData = async () => {
         try {
             setLoading(true);
@@ -33,6 +36,8 @@ function GetCompany() {
                     Authorization: `Bearer ${token}`
                 }
             });
+            console.log(response.data.data,"apidetails")
+            setApiResponse(response.data.data);
             setCompanyData(response.data.data.data);
             
         } catch (error) {
@@ -44,9 +49,29 @@ function GetCompany() {
         }
     };
 
+    const replacePagehost = (url) => {
+        return url.replace(`${process.env.REACT_APP_API_URL}/api/admin/company`);
+      };
+
+    const handleNext = () => {
+        if (apiResponse && apiResponse.next) {
+         const nexturl = replacePagehost(apiResponse.next)
+         console.log(nexturl,"next")
+         fetchCompanyData(nexturl);
+       }
+   };
+
+   const handlePrevious = () => {
+    if (apiResponse && apiResponse.previous) {
+        const previousurl = replacePagehost(apiResponse.previous);
+        console.log(previousurl, "previous");
+        fetchCompanyData(previousurl);
+    }
+};
+
   
     useEffect(() => {
-        fetchCompanyData();
+        fetchCompanyData(URL);
     }, []);
 
     const handleViewClick = (company) => {
@@ -87,7 +112,7 @@ function GetCompany() {
                 });
         
                 if (response.status === 200) {
-                    fetchCompanyData()
+                    fetchCompanyData(URL)
                     // window.alert("Company deleted successfully.");
                     toast.success('Company deleted successfully.');
                 }   
@@ -106,6 +131,8 @@ function GetCompany() {
             }
       
     };
+
+    
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -149,7 +176,7 @@ function GetCompany() {
             if (response.status === 200) {
                 // window.alert("User Updated Successfully");
                 toast.success('Company Updated Successfully');
-                fetchCompanyData()  
+                fetchCompanyData(URL)  
                 handleCloseClick()
              } setSelectedCompany(null); // Close the modal after updating
 
@@ -191,6 +218,10 @@ function GetCompany() {
                     </div>
                 </div>
             ))}
+            <div className='text-center pt-4'>
+              <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Previous</button>
+              <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Next</button>
+            </div>
             {selectedCompany && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
