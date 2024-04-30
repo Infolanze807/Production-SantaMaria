@@ -25,12 +25,12 @@ function GetBanner() {
             
         } catch (error) {
             console.error('Error fetching banner data:', error);
+            window.alert('Error fetching banner data. Please try again.');
             setError('Error fetching banner data. Please try again.');
         }
     };
 
         useEffect(() => {
-      
             fetchBannerData();
         }, []);
 
@@ -50,12 +50,12 @@ function GetBanner() {
         const handleDeleteClick = async (bannerId) => {
 
             if (window.confirm("Are you sure you want to delete?")) {
-        try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found. Please login again.');
-            }
-            
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        throw new Error('No token found. Please login again.');
+                    }
+                    
             const base64EncodedIdObject = btoa(JSON.stringify({
                 "iv": bannerId.iv,
                 "encryptedData": bannerId.encryptedData
@@ -74,6 +74,7 @@ function GetBanner() {
         } catch (error) {
             console.error('Error deleting Banner:', error);
             console.error('Error response from server:', error.response?.data); // Log the response data directly
+            window.alert('Error deleting Banner. Please try again.');
         }
           console.log("Item deleted");  // This would be replaced with actual deletion logic
         } else {
@@ -84,13 +85,14 @@ function GetBanner() {
 };
     
 
-    const handleChange = (e) => {
-        if (e.target.name === 'image') {
-            setFormData({ ...formData, image: e.target.files[0] });
-        } else {
-            setFormData({ ...formData, [e.target.name]: e.target.value });
-        }
-    };
+const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'image') {
+        setFormData({ ...formData, [name]: e.target.files[0] });
+    } else {
+        setFormData({ ...formData, [name]: value });
+    }
+};
 
     const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,7 +116,7 @@ function GetBanner() {
 
         
         if (response.status === 200) {
-            window.alert("User Updated Successfully");
+            window.alert("Banner Updated Successfully");
             fetchBannerData()  
             handleCloseClick()
          } setSelectedBanner(null); // Close the modal after updating
@@ -122,6 +124,7 @@ function GetBanner() {
     } catch (error) {
         console.error('Error updating banner:', error);
         console.error('Error response from server:', error.response?.data); // Log the response data directly
+        window.alert("Error updating banner")
     }
     };
 

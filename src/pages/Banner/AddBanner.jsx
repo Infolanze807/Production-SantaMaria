@@ -33,14 +33,15 @@ function AddBanner() {
         // Clear form fields
         setName('');
         setDescription('');
-        setImage(null)
+        setImage(null); // Clear image state
         // Optionally, alert the user
         window.alert('Banner added successfully.');
-    }
+      }
       console.log(response.data);
     } catch (error) {
       console.error('Error adding banner:', error);
       setError('Error adding banner. Please try again.');
+      window.alert('Error adding banner. Please try again.');
     }
   };
 

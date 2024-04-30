@@ -53,10 +53,9 @@ function AddEmergency() {
         }
         console.log(response.data)
     } catch (error) {
-        console.error('Error adding company:', error);
-        setError('Error adding company. Please try again.');
-        
-        window.alert('Error adding company. Please try again.');
+        console.error('Error adding Contact:', error) ;
+        setError('Error adding Contact. Please try again.');
+        window.alert('Error adding Contact. Please try again.');
       }
     };
 

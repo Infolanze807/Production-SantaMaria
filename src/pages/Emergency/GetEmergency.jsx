@@ -28,6 +28,8 @@ function GetEmergency() {
             
         } catch (error) {
             console.error('Error fetching emergency data:', error);
+            window.alert('Error fetching emergency data. Please try again.');
+            setError('Error fetching emergency data. Please try again.');
         }
     };
 
@@ -78,13 +80,13 @@ function GetEmergency() {
         } catch (error) {
             console.error('Error deleting Contact:', error);
             console.error('Error response from server:', error.response?.data); // Log the response data directly
+            window.alert('Error deleting Contact. Please try again.');
         }
           console.log("Item deleted");  // This would be replaced with actual deletion logic
         } else {
           // If the user clicks "No", simply close the dialog
           console.log("Deletion cancelled");  // This line is optional, for debugging
         }
-  
 };
 
 const handleChange = (e) => {
@@ -117,6 +119,7 @@ const handleChange = (e) => {
             // After updating, fetch updated emergency data
             if (response.status === 200) {
                 window.alert("User Updated Successfully");
+                // console.log("User Updated Successfully")
                 fetchEmergencyData()    
                 handleCloseClick()
              } setSelectedEmergency(null); // Close the modal after updating
@@ -124,6 +127,7 @@ const handleChange = (e) => {
             } catch (error) {
                 console.error('Error updating Contact:', error);
                 console.error('Error response from server:', error.response?.data); // Log the response data directly
+                window.alert("Error updating Contact")
             }
     };
 

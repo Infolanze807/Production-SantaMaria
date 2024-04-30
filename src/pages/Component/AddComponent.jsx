@@ -36,7 +36,7 @@ function AddComponent() {
       formDataToSend.append('profile_image', formData.profile_image);
       formDataToSend.append('cover_image', formData.cover_image);
       formDataToSend.append('icon', formData.icon);
-
+  
       const response = await axios.post('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/component', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -57,12 +57,13 @@ function AddComponent() {
         window.alert('Component added successfully.');
     }
       console.log(response.data);
-
+  
     } catch (error) {
       console.error('Error adding component:', error);
       setError('Error adding component. Please try again.');
     }
   };
+  
 
   return (
     <div>

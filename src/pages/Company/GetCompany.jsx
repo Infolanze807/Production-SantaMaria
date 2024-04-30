@@ -30,6 +30,7 @@ function GetCompany() {
             
         } catch (error) {
             console.error('Error fetching company data:', error);
+            window.alert('Error fetching cpmpany data. Please try again.');
             setError('Error fetching company data. Please try again.');
         }
     };
@@ -83,6 +84,7 @@ function GetCompany() {
             } catch (error) {
                 console.error('Error deleting company:', error);
                 console.error('Error response from server:', error.response?.data); // Log the response data directly
+                window.alert('Error deleting company. Please try again.');
             }
               console.log("Item deleted");  // This would be replaced with actual deletion logic
             } else {

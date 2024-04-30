@@ -54,8 +54,7 @@ function AddCompany() {
       console.log(response.data);
     } catch (error) {
       console.error('Error adding company:', error);
-      setError('Error adding company. Please try again.');
-      
+      setError('Error adding company. Please try again.');    
       window.alert('Error adding company. Please try again.');
     }
   };

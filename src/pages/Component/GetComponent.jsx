@@ -30,6 +30,7 @@ function GetComponent() {
       // setToken(storedToken);
     } catch (error) {
       console.error('Error fetching component data:', error);
+      window.alert('Error fetching component data. Please try again.');
       setError('Error fetching component data. Please try again.');
     }
   };
@@ -78,7 +79,8 @@ function GetComponent() {
   } catch (error) {
     console.error('Error deleting Component:', error);
     console.error('Error response from server:', error.response?.data); // Log the response data directly
-}
+    window.alert('Error deleting Component. Please try again.');
+  }
   console.log("Item deleted");  // This would be replaced with actual deletion logic
 } else {
   // If the user clicks "No", simply close the dialog
@@ -125,6 +127,7 @@ function GetComponent() {
     } catch (error) {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
+      window.alert("Error updating component")
     }
   };
 
@@ -134,6 +137,8 @@ function GetComponent() {
         <div key={component.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
           <div className='col-span-2'>
             {component.profile_image && <img className='w-full object-cover rounded-lg' src={component.profile_image} alt="" />}
+            {component.cover_image && <img className='w-full object-cover rounded-lg' src={component.cover_image} alt="" />}
+            {component.icon && <img className='w-full object-cover rounded-lg' src={component.icon} alt="" />}
           </div>
           <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
             <div>Name: &nbsp;<span className='font-normal'>{component.name}</span></div>
@@ -180,7 +185,7 @@ function GetComponent() {
       )}
       {error && <div className="text-red-600">{error}</div>}
     </div>
-  );
+  );  
 }
 
 export default GetComponent;
