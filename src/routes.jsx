@@ -6,7 +6,7 @@ import {
   ServerStackIcon,
   RectangleStackIcon,
 } from "@heroicons/react/24/solid";
-import { Events, News, Company } from "@/pages/dashboard";
+import { Events, Company } from "@/pages/dashboard";
 import { SignIn } from "@/pages/auth";
 import Supplier from "./pages/dashboard/Supplier";
 import { HiBuildingOffice } from "react-icons/hi2";
@@ -37,16 +37,16 @@ export const routes = [
       },
       {
         icon: <UserCircleIcon {...icon} />,
-        name: "Events",
+        name: "News & Events",
         path: "/events",
         element: <Events />,
       },
-      {
-        icon: <TableCellsIcon {...icon} />,
-        name: "News",
-        path: "/news",
-        element: <News />,
-      },
+      // {
+      //   icon: <TableCellsIcon {...icon} />,
+      //   name: "News",
+      //   path: "/news",
+      //   element: <News />,
+      // },
       {
         icon: <HiBuildingOffice {...icon} />,
         name: "Company",
