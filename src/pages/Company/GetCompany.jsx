@@ -96,11 +96,21 @@ function GetCompany() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prevData => ({
-            ...prevData,
-            [name]: value
-        }));
+        if (name === 'profile_image' || name === 'cover_image') {
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: e.target.files[0]
+            }));
+        } else {
+            setFormData(prevData => ({
+                ...prevData,
+                [name]: value
+            }));
+        }
     };
+    
+    
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -134,16 +144,20 @@ function GetCompany() {
         }
     };
 
+    const replaceLocalhost = (url) => {
+        return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
+    };
+
     return (
         <div>
             {companyData.map(company => (
                 <div key={company.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
                     <div className='col-span-2 relative'>
                         <div className='pt-11 lg:w-72'>
-                            <img className='-z-10 w-full object-cover rounded-lg' src={company.cover_image} alt="" />
+                            <img className='-z-10 w-full object-cover rounded-lg' src={replaceLocalhost(company.cover_image)} alt="" />
                         </div>
                         <div className=''>
-                            <img className='absolute border-4 bg-white w-24 h-24 rounded-full object-cover left-6 top-0' src={company.profile_image} alt="" />
+                            <img className='absolute border-4 bg-white w-24 h-24 rounded-full object-cover left-6 top-0' src={replaceLocalhost(company.profile_image)} alt="" />
                         </div>
                     </div>
                     <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
@@ -183,6 +197,14 @@ function GetCompany() {
                             <div className="mb-4">
                                 <label htmlFor="location" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Location</label>
                                 <input value={formData.location} onChange={handleChange} placeholder='Location...' type="text" id="location" name="location" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                            </div>
+                            <div className='mb-4'>
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="profile_img">Profile Image</label>
+                                <input onChange={handleChange} name='profile_image' className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
+                            </div>
+                            <div className='mb-4'>
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="cover_img">Cover Image</label>
+                                <input onChange={handleChange} name='cover_image' className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
                             </div>
                             <div className="flex items-center justify-end space-x-4">
                                 <button type="button" onClick={handleCloseClick} className="border border-gray-300 text-gray-900 dark:text-white rounded-lg px-6 py-2">Cancel</button>

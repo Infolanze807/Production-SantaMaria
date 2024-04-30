@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 function AddEmergency() {
@@ -10,13 +11,17 @@ function AddEmergency() {
     });
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         if (storedToken) {
           setToken(storedToken);
+        } else {
+          navigate('/sign-in');
+          alert("Token is not valid. Please login first.");
         }
-      }, []);
+      }, [navigate]);
 
       const handleChange = (e) => {
         if (e.target.name === 'profile_image' || e.target.name === 'cover_image') {

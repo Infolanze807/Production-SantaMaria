@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 function AddCompany() {
@@ -11,13 +12,17 @@ function AddCompany() {
   const [coverImage, setCoverImage] = useState(null);
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
+    } else {
+      navigate('/sign-in');
+      alert("Token is not valid. Please login first.");
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

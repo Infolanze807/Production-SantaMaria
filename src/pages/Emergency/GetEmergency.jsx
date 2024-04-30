@@ -131,23 +131,34 @@ const handleChange = (e) => {
             }
     };
 
+    const replaceLocalhost = (url) => {
+        return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
+    };
+
     return (
-        <div>
-            {emergencyData.map(emergency => (
-                <div key={emergency.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
-                    <div className='col-span-2'>
-                        <img className='w-full object-cover rounded-lg' src={emergency.cover_image} alt="" />
+        <div className='pb-7'>
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
+                {emergencyData.map(emergency => (
+                <div key={emergency.id.emergencyData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
+                <div className='relative'>
+                    <div className='pt-11'>
+                        <img className='-z-10 w-full object-cover rounded-lg' src={replaceLocalhost(emergency.cover_image)} alt="" />
                     </div>
-                    <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
-                        <div>Name: &nbsp;<span className='font-normal'>{emergency.name}</span></div>
-                        <div>Contact No: &nbsp;<span className='font-normal'>{emergency.contact_no}</span></div>
-                    </div>
-                    <div className='lg:flex lg:flex-col mx-auto gap-2 pt-4 lg:pt-0'>
-                        <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(emergency)}>View</button>
-                        <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" onClick={() => handleDeleteClick(emergency.id)}>Delete</button>
+                    <div className='absolute border-2 border-white rounded-full left-1/2 transform -translate-x-1/2 top-0'>
+                        <img className='w-20 h-20 rounded-full object-cover' src={replaceLocalhost(emergency.profile_image)} alt="" />
                     </div>
                 </div>
-            ))}
+                    <div className="p-6 py-0 px-1 pt-5">
+                    <p className="block antialiased font-sans text-sm text-gray-900 font-semibold">Name: &nbsp;<span className='font-normal'>{emergency.name}</span></p>
+                    <div className='text-sm pt-1 text-gray-900 font-semibold'>Number: &nbsp;<span className='font-normal'>{emergency.contact_no}</span></div>
+                    </div>
+                    <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
+                    <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(emergency)}>View</button>
+                    <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(emergency.id)}>Delete</button>
+                    </div>
+                </div>
+                ))}
+            </div>
             {selectedEmergency && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
