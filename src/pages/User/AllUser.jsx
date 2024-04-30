@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { HiOutlineDotsVertical } from "react-icons/hi";
 
 function AllUser({users}) {

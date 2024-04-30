@@ -57,7 +57,7 @@ function UserRequest({users,onDataChange}) {
                 </th>
                 <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
                   <p className="block antialiased font-sans text-sm text-blue-gray-400 uppercase">
-                    First Name
+                    Name
                   </p>
                 </th>
                 {/* <th className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -94,7 +94,7 @@ function UserRequest({users,onDataChange}) {
             </thead>
             <tbody>
               {users.map((user, index) => (
-                <tr key={index}>
+                <tr className="hover:cursor-pointer" key={index}>
                    <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-blue-gray-900 font-bold">
                     {index+1}
                   </td>
@@ -118,12 +118,12 @@ function UserRequest({users,onDataChange}) {
                   </td>
 
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-center">
-                    <button className="bg-green-500 px-5 p-2 rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleApprove(user)}>
+                    <button className="bg-green-500 px-5 p-2 rounded-full text-white" onClick={() => handleApprove(user)}>
                       Accept
                     </button>
-                    <button className="bg-red-500 px-5 p-2 rounded-full text-white">
+                    {/* <button className="bg-red-500 px-5 p-2 rounded-full text-white">
                       Reject
-                    </button>
+                    </button> */}
                   </td>
                 </tr>
               ))}
