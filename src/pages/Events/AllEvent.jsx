@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaRegStar } from "react-icons/fa";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Loader from '../Loader';
 
 function AllEvent() {
   const [apiResponse, setApiResponse] = useState(null);
@@ -14,11 +17,15 @@ function AllEvent() {
     image: null,
   });
   const [error, setError] = useState('');
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=5&page=1`
 
   const fetchEventData = async (url) => {
     try {
+      setLoading(true);
       const storedToken = localStorage.getItem('token');
       if (!storedToken) {
         throw new Error('No token found. Please login again.');
@@ -37,7 +44,9 @@ function AllEvent() {
     } catch (error) {
       console.error('Error fetching News and Event data:', error);
       setError('Error fetching News and Event data. Please try again.');
-    }
+    } finally {
+      setLoading(false); // Set loading back to false after fetching data
+  }
   };
   const replaceLocalhost = (url) => {
     return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
@@ -83,6 +92,7 @@ const handlePrevious = () => {
   const handleDeleteClick = async (eventId) => {
     if (window.confirm("Are you sure you want to delete?")) {
       try {
+        setDeleteLoadingId(eventId);
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('No token found. Please login again.');
@@ -100,13 +110,16 @@ const handlePrevious = () => {
         });
         if (response.status === 200) {
           fetchEventData(URL);
-          window.alert("News and Event deleted successfully.");
+          // window.alert("News and Event deleted successfully.");
+          toast.success('News or Event deleted successfully.');
         }
       } catch (error) {
         console.error('Error deleting News and Event:', error);
         console.error('Error response from server:', error.response?.data); // Log the response data directly
-    }
-      console.log("Item deleted");  // This would be replaced with actual deletion logic
+    } finally {
+      setDeleteLoadingId(null); // Set loading state to false after API call completes
+  } 
+      // console.log("Item deleted");  // This would be replaced with actual deletion logic
     } else {
       // If the user clicks "No", simply close the dialog
       console.log("Deletion cancelled");  // This line is optional, for debugging
@@ -126,6 +139,7 @@ const handlePrevious = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoadingUpdate(true);
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No token found. Please login again.');
@@ -144,7 +158,8 @@ const handlePrevious = () => {
     });
 
         if (response.status === 200) {
-          window.alert("News and Event updated successfully.");
+          // window.alert("News and Event updated successfully.");
+          toast.success('News or Event Updated Successfully');
           fetchEventData(URL);
           handleCloseClick();
         }setSelectedEvent(null)
@@ -152,13 +167,16 @@ const handlePrevious = () => {
     } catch (error) {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
-    }
+    } finally {
+      setLoadingUpdate(false);
+  }
   };
 
 
 
   return (
     <div className='pb-7'>
+    {loading && <Loader />}
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
         {eventData.map(event => (
           <div key={event.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
@@ -173,7 +191,7 @@ const handlePrevious = () => {
             </div>
             <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
               <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleViewClick(event)}>View</button>
-              <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(event.id)}>Delete</button>
+              <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" disabled={deleteLoadingId === event.id} onClick={() => handleDeleteClick(event.id)}>{deleteLoadingId === event.id ? 'Deleting...' : 'Delete'}</button>
             </div>
             
           </div>
@@ -206,7 +224,7 @@ const handlePrevious = () => {
               </div>
               <div className="mb-4">
                 <label htmlFor="published_date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published Date</label>
-                <input readOnly value={formData.published_date} onChange={handleChange} type="text" id="published_date" name="published_date" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                <input readOnly value={new Date(formData.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })} onChange={handleChange} type="text" id="published_date" name="published_date" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="mb-4">
                 <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News and Event Image</label>
@@ -218,7 +236,7 @@ const handlePrevious = () => {
               </div>
               <div className="flex items-center justify-end space-x-4">
                 <button type="button" onClick={handleCloseClick} className="border border-gray-300 text-gray-900 dark:text-white rounded-lg px-6 py-2">Cancel</button>
-                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2">Update</button>
+                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
               </div>
             </form>
           </div>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddEvent() {
   const [eventTitle, setEventTitle] = useState('');
@@ -12,6 +14,7 @@ function AddEvent() {
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -26,6 +29,7 @@ function AddEvent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append('title', eventTitle);
       formData.append('type', eventType);
@@ -51,13 +55,16 @@ function AddEvent() {
         setIsFeatured(false);
         setError('');
         // Optionally, alert the user
-        window.alert('News and added successfully.');
+        // window.alert('News and added successfully.');
+        toast.success('News or Event added successfully.');
       }
       console.log(response.data);
     } catch (error) {
       console.error('Error adding event:', error);
       setError('Error adding event. Please try again.');
       window.alert('Error adding event. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false after data submission
     }
   };
 
@@ -92,7 +99,7 @@ function AddEvent() {
           <label htmlFor="isFeatured" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Show on top</label>
         </div>
         <div className=''>
-          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
+          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
         </div>
         {/* Display error message if there's an error */}
         {error && <div className="text-red-600">{error}</div>}
