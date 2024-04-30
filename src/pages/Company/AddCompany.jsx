@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 function AddCompany() {
@@ -11,13 +12,17 @@ function AddCompany() {
   const [coverImage, setCoverImage] = useState(null);
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
+    } else {
+      navigate('/sign-in');
+      alert("Token is not valid. Please login first.");
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +36,7 @@ function AddCompany() {
       formData.append('profile_image', companyImage);
       formData.append('cover_image', coverImage);
 
-      const response = await axios.post('${process.env.REACT_APP_API_URL}/api/admin/company', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/company`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`

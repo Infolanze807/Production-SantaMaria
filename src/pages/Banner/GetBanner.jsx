@@ -16,7 +16,7 @@ function GetBanner() {
                 throw new Error('No token found. Please login again.');
             }
 
-            const response = await axios.get('${process.env.REACT_APP_API_URL}/api/admin/banner', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/banner`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

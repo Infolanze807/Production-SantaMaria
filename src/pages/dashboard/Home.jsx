@@ -24,7 +24,7 @@ function Home() {
             throw new Error('No token found. Please login again.');
         }
 
-        const response = await axios.get('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/user', {
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/user`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

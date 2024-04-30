@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { FaRegStar } from "react-icons/fa";
 
 function AllNews() {
   const [newsData, setnewsData] = useState([]);
@@ -88,6 +89,8 @@ function AllNews() {
   const handleChange = (e) => {
     if (e.target.name === 'image') {
       setFormData({ ...formData, [e.target.name]: e.target.files[0] });
+    } else if (e.target.name === 'isFeatured') {
+      setFormData({ ...formData, isFeatured: e.target.checked });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
@@ -125,9 +128,13 @@ function AllNews() {
     }
   };
 
+  const replaceLocalhost = (url) => {
+    return url.replace("http://localhost:5000", "${process.env.REACT_APP_API_URL}");
+};
+
   return (
-    <div>
-      {newsData.map(event => (
+    <div className='pb-7'>
+      {/* {newsData.map(event => (
         <div key={event.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
           <div className='col-span-2'>
             {event.image && <img className='w-52 h-52 object-cover rounded-lg' src={event.image} alt="" />}
@@ -143,31 +150,53 @@ function AllNews() {
             <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" onClick={() => handleDeleteClick(event.id)}>Delete</button>
           </div>
         </div>
-      ))}
+      ))} */}
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
+        {newsData.map(event => (
+          <div key={event.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
+            <div className="relative bg-clip-border rounded-xl overflow-hidden bg-gray-900 text-white shadow-gray-900/20 shadow-lg mx-0 mt-0 mb-4 h-64 xl:h-40">
+              <img src={replaceLocalhost(event.image)} alt={event.title} className="h-full w-full object-cover" />
+            </div>
+            <div className="p-6 py-0 px-1">
+            <div className='flex items-center justify-between'><h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-blue-gray-900 mt-1 mb-2">{event.title}</h5><FaRegStar /></div>
+              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-500">{event.content}</p>
+            <div className='text-sm text-blue-gray-500 pt-2'>Date: {new Date(event.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</div>
+            </div>
+            <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
+              <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleViewClick(event)}>View</button>
+              <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(event.id)}>Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
       {selectedEvent && (
         <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">Update Event</h2>
+            <h2 className="text-2xl font-bold mb-4">Update News</h2>
             <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Title</label>
+                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News Title</label>
                 <input value={formData.title} onChange={handleChange} type="text" id="title" name="title" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Title..." required />
               </div>
               <div className="mb-4">
-                <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Type</label>
+                <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News Type</label>
                 <input value={formData.type} onChange={handleChange} type="text" id="type" name="type" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Type..." required />
               </div>
               <div className="mb-4">
-                <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Content</label>
+                <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News Content</label>
                 <textarea value={formData.content} onChange={handleChange} placeholder='Event Content...' type="text" id="content" name="content" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
               </div>
               <div className="mb-4">
                 <label htmlFor="published_date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published Date</label>
-                <input value={formData.published_date} onChange={handleChange} type="date" id="published_date" name="published_date" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                <input value={formData.published_date} onChange={handleChange} type="date" id="published_date" name="published_date" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="mb-4">
-                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Image</label>
+                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News Image</label>
                 <input onChange={handleChange} type="file" id="image" name="image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+              </div>
+              <div className="flex items-center mb-5">
+                <label htmlFor="isFeatured" className="text-sm font-medium text-gray-900 dark:text-gray-300">Show on top</label>
+                <input  checked={formData.isFeatured} onChange={handleChange} name="isFeatured" id="isFeatured" type="checkbox" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
               </div>
               <div className="flex items-center justify-end space-x-4">
                 <button type="button" onClick={handleCloseClick} className="border border-gray-300 text-gray-900 dark:text-white rounded-lg px-6 py-2">Cancel</button>

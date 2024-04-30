@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 function AddEmergency() {
@@ -10,13 +11,17 @@ function AddEmergency() {
     });
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         if (storedToken) {
           setToken(storedToken);
+        } else {
+          navigate('/sign-in');
+          alert("Token is not valid. Please login first.");
         }
-      }, []);
+      }, [navigate]);
 
       const handleChange = (e) => {
         if (e.target.name === 'profile_image' || e.target.name === 'cover_image') {
@@ -35,7 +40,7 @@ function AddEmergency() {
             formDataToSend.append('profile_image', formData.profile_image);
             formDataToSend.append('cover_image', formData.cover_image);
 
-            const response = await axios.post('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/contact', formDataToSend, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/contact`, formDataToSend, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}`
