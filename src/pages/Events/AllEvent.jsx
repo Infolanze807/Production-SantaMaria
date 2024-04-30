@@ -21,7 +21,7 @@ function AllEvent() {
         throw new Error('No token found. Please login again.');
       }
 
-      const response = await axios.get('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent`, {
         headers: {
           Authorization: `Bearer ${storedToken}`
         }
@@ -30,6 +30,7 @@ function AllEvent() {
       setEventData(events);
     } catch (error) {
       console.error('Error fetching event data:', error);
+      window.alert('Error fetching event data. Please try again.')
       setError('Error fetching event data. Please try again.');
     }
   };
@@ -45,7 +46,7 @@ function AllEvent() {
       type: event.type,
       content: event.content,
       published_date: event.published_date,
-      image: null, // Assuming you don't want to change the image on update
+      image: event.image,
     });
   };
 
@@ -66,7 +67,7 @@ function AllEvent() {
           "encryptedData": eventId.encryptedData
         }));
 
-        const response = await axios.delete(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent/${base64EncodedIdObject}`, {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -78,6 +79,7 @@ function AllEvent() {
       } catch (error) {
         console.error('Error deleting Event:', error);
         console.error('Error response from server:', error.response?.data); // Log the response data directly
+        window.alert('Error deleting Event. Please try again.');
     }
       console.log("Item deleted");  // This would be replaced with actual deletion logic
     } else {
@@ -109,7 +111,7 @@ function AllEvent() {
         "encryptedData": selectedEvent.id.encryptedData
     }));
 
-    const response = await axios.put(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
      Authorization: `Bearer ${token}`
@@ -125,11 +127,12 @@ function AllEvent() {
     } catch (error) {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
+      window.alert("Error updating banner")
     }
   };
 
   const replaceLocalhost = (url) => {
-    return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
+    return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
 };
 
   return (

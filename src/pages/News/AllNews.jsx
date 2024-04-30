@@ -20,7 +20,7 @@ function AllNews() {
         throw new Error('No token found. Please login again.');
       }
 
-      const response = await axios.get('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent', {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent`, {
         headers: {
           Authorization: `Bearer ${storedToken}`
         }
@@ -65,7 +65,7 @@ function AllNews() {
           "encryptedData": eventId.encryptedData
         }));
 
-        const response = await axios.delete(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent/${base64EncodedIdObject}`, {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -106,7 +106,7 @@ function AllNews() {
         "encryptedData": selectedEvent.id.encryptedData
     }));
 
-    const response = await axios.put(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
      Authorization: `Bearer ${token}`

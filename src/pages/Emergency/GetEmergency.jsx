@@ -66,7 +66,7 @@ function GetEmergency() {
                 "encryptedData": emergencyId.encryptedData
             }));
             
-            const response = await axios.delete(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/contact/${base64EncodedIdObject}`, {
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}admin/contact/${base64EncodedIdObject}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }

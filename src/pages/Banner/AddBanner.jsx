@@ -23,7 +23,7 @@ function AddBanner() {
       formDataToSend.append('description', description);
       formDataToSend.append('image', image);
 
-      const response = await axios.post('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/banner', formDataToSend, {
+      const response = await axios.post('${process.env.REACT_APP_API_URL}/api/admin/banner', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
