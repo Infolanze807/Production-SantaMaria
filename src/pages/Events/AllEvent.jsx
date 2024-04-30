@@ -3,6 +3,7 @@ import axios from 'axios';
 import { FaRegStar } from "react-icons/fa";
 
 function AllEvent() {
+  const [apiResponse, setApiResponse] = useState(null);
   const [eventData, setEventData] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [formData, setFormData] = useState({
@@ -14,28 +15,54 @@ function AllEvent() {
   });
   const [error, setError] = useState('');
 
-  const fetchEventData = async () => {
+  const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=5&page=1`
+
+  const fetchEventData = async (url) => {
     try {
       const storedToken = localStorage.getItem('token');
       if (!storedToken) {
         throw new Error('No token found. Please login again.');
       }
 
-      const response = await axios.get('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent', {
+      const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${storedToken}`
         }
       });
-      const events = response.data.data.data.filter(item => item.type === 'Event');
-      setEventData(events);
+      //const events = response.data.data.data.filter(item => item.type === 'Event');
+      // events.sort((a, b) => b.isFeatured - a.isFeatured || new Date(b.published_date) - new Date(a.published_date));
+      console.log(response.data.data,"apidetails")
+      setApiResponse(response.data.data);
+      setEventData(response.data.data.data);
     } catch (error) {
-      console.error('Error fetching event data:', error);
-      setError('Error fetching event data. Please try again.');
+      console.error('Error fetching News and Event data:', error);
+      setError('Error fetching News and Event data. Please try again.');
     }
   };
+  const replaceLocalhost = (url) => {
+    return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
+};
+const replacePagehost = (url) => {
+  return url.replace("http://localhost:5000/api/admin/news_and_event", `${process.env.REACT_APP_API_URL}/api/admin/newsandevent`);
+};
+  const handleNext = () => {
+     if (apiResponse && apiResponse.next) {
+      const nexturl = replacePagehost(apiResponse.next)
+      console.log(nexturl,"next")
+      fetchEventData(nexturl);
+    }
+};
+
+const handlePrevious = () => {
+    if (apiResponse && apiResponse.previous) {
+     const previousurl =  replacePagehost(apiResponse.previous)
+      console.log(apiResponse.previous,"previos")
+      fetchEventData(previousurl);
+    }
+};
 
   useEffect(() => {
-    fetchEventData();
+    fetchEventData(URL);
   }, []);
 
   const handleViewClick = (event) => {
@@ -66,17 +93,17 @@ function AllEvent() {
           "encryptedData": eventId.encryptedData
         }));
 
-        const response = await axios.delete(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent/${base64EncodedIdObject}`, {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
         if (response.status === 200) {
-          fetchEventData();
-          window.alert("Event deleted successfully.");
+          fetchEventData(URL);
+          window.alert("News and Event deleted successfully.");
         }
       } catch (error) {
-        console.error('Error deleting Event:', error);
+        console.error('Error deleting News and Event:', error);
         console.error('Error response from server:', error.response?.data); // Log the response data directly
     }
       console.log("Item deleted");  // This would be replaced with actual deletion logic
@@ -109,7 +136,7 @@ function AllEvent() {
         "encryptedData": selectedEvent.id.encryptedData
     }));
 
-    const response = await axios.put(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
+    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
      Authorization: `Bearer ${token}`
@@ -117,8 +144,8 @@ function AllEvent() {
     });
 
         if (response.status === 200) {
-          window.alert("Event updated successfully.");
-          fetchEventData();
+          window.alert("News and Event updated successfully.");
+          fetchEventData(URL);
           handleCloseClick();
         }setSelectedEvent(null)
 
@@ -128,9 +155,7 @@ function AllEvent() {
     }
   };
 
-  const replaceLocalhost = (url) => {
-    return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
-};
+
 
   return (
     <div className='pb-7'>
@@ -143,38 +168,48 @@ function AllEvent() {
             <div className="p-6 py-0 px-1">
             <div className='flex items-center justify-between'><h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-blue-gray-900 mt-1 mb-2">{event.title}</h5><FaRegStar /></div>
               <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-500">{event.content}</p>
+              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-500">{event.type}</p>
             <div className='text-sm text-blue-gray-500 pt-2'>Date: {new Date(event.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</div>
             </div>
             <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
               <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleViewClick(event)}>View</button>
               <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(event.id)}>Delete</button>
             </div>
+            
           </div>
         ))}
       </div>
+      <div className='text-center pt-4'>
+              <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Previous</button>
+              <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Next</button>
+              </div>
       {selectedEvent && (
         <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">Update Event</h2>
+            <h2 className="text-2xl font-bold mb-4">Update News and Event</h2>
             <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
               <div className="mb-4">
-                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Title</label>
-                <input value={formData.title} onChange={handleChange} type="text" id="title" name="title" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Title..." required />
+              <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Title</label>
+                <input value={formData.title} onChange={handleChange} type="text" id="title" name="title" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="News and Event Title..." required />
               </div>
               <div className="mb-4">
-                <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Type</label>
-                <input disabled value={formData.type} onChange={handleChange} type="text" id="type" name="type" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Type..." required />
+              <label htmlFor="eventType" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Type</label>
+                {/* <input value={formData.title} onChange={handleChange} type="text" id="title" name="title" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="News and Event Title..." required /> */}
+                <select id="eventType" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={formData.type} onChange={handleChange} required>
+                  <option value="Event">Event</option>
+                  <option value="News">News</option>
+                 </select>
               </div>
               <div className="mb-4">
-                <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Content</label>
-                <textarea value={formData.content} onChange={handleChange} placeholder='Event Content...' type="text" id="content" name="content" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News and Event Content</label>
+                <textarea value={formData.content} onChange={handleChange} placeholder='News and Event Content...' type="text" id="content" name="content" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
               </div>
               <div className="mb-4">
                 <label htmlFor="published_date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published Date</label>
-                <input value={formData.published_date} onChange={handleChange} type="date" id="published_date" name="published_date" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+                <input readOnly value={formData.published_date} onChange={handleChange} type="text" id="published_date" name="published_date" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="mb-4">
-                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Image</label>
+                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News and Event Image</label>
                 <input onChange={handleChange} type="file" id="image" name="image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="flex items-center mb-5">

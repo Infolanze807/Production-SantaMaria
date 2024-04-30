@@ -26,7 +26,7 @@ function GetEmergency() {
                 throw new Error('No token found. Please login again.');
             }
 
-            const response = await axios.get('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/contact', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/contact`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -76,7 +76,7 @@ function GetEmergency() {
                 "encryptedData": emergencyId.encryptedData
             }));
             
-            const response = await axios.delete(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/contact/${base64EncodedIdObject}`, {
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}admin/contact/${base64EncodedIdObject}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -130,7 +130,7 @@ const handleChange = (e) => {
                 "iv": selectedEmergency.id.iv,
                 "encryptedData": selectedEmergency.id.encryptedData
             }));
-            const response = await axios.put(`http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/contact/${base64EncodedIdObject}`, formData, {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/contact/${base64EncodedIdObject}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                  Authorization: `Bearer ${token}`
@@ -156,7 +156,7 @@ const handleChange = (e) => {
     };
 
     const replaceLocalhost = (url) => {
-        return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
+        return url.replace("http://localhost:5000", "${process.env.REACT_APP_API_URL}");
     };
 
     return (

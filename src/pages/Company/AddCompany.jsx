@@ -40,7 +40,7 @@ function AddCompany() {
       formData.append('profile_image', companyImage);
       formData.append('cover_image', coverImage);
 
-      const response = await axios.post('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/company', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/company`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`

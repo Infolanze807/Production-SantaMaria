@@ -4,7 +4,7 @@ import axios from 'axios';
 
 function AddEvent() {
   const [eventTitle, setEventTitle] = useState('');
-  const [eventType, setEventType] = useState('Event');
+  const [eventType, setEventType] = useState('');
   const [eventContent, setEventContent] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [eventImage, setEventImage] = useState(null);
@@ -35,7 +35,7 @@ function AddEvent() {
       formData.append('isFeatured', isFeatured);
 
         console.log(eventType)
-      const response = await axios.post('http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -44,14 +44,14 @@ function AddEvent() {
       if (response.status === 201) {
         // Clear form fields
         setEventTitle('');
-        setEventType('Event');
+        setEventType('');
         setEventContent('');
         setEventDate('');
         setEventImage(null);
         setIsFeatured(false);
         setError('');
         // Optionally, alert the user
-        window.alert('Event added successfully.');
+        window.alert('News and added successfully.');
       }
       console.log(response.data);
     } catch (error) {
@@ -65,23 +65,23 @@ function AddEvent() {
     <div className='p-4 py-8 mb-7 bg-[--main-color] bg-clip-border rounded-xl'>
       <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
         <div className="mb-5">
-          <label htmlFor="eventTitle" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Title</label>
-          <input type="text" id="eventTitle" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Event Title..." value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
+          <label htmlFor="eventTitle" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Title</label>
+          <input type="text" id="eventTitle" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="News & Event Title..." value={eventTitle} onChange={(e) => setEventTitle(e.target.value)} required />
         </div>
         <div className="mb-5">
-          <label htmlFor="eventType" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Type</label>
-          <select disabled id="eventType" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventType} onChange={(e) => setEventType(e.target.value)} required>
+          <label htmlFor="eventType" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Type</label>
+          <select id="eventType" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventType} onChange={(e) => setEventType(e.target.value)} required>
             <option value="Event">Event</option>
-            {/* <option value="News">News</option> */}
+            <option value="News">News</option>
           </select>
         </div>
         <div className="mb-5">
-          <label htmlFor="eventContent" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Description</label>
-          <textarea placeholder='Event Description...' id="eventContent" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventContent} onChange={(e) => setEventContent(e.target.value)} required />
+          <label htmlFor="eventContent" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Description</label>
+          <textarea placeholder='News & Event Description...' id="eventContent" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventContent} onChange={(e) => setEventContent(e.target.value)} required />
         </div>
         <div className="mb-5">
-          <label htmlFor="eventDate" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Event Date</label>
-          <input placeholder='Event Date...' type="date" id="eventDate" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventDate} onChange={(e) => setEventDate(e.target.value)} required />
+          <label htmlFor="eventDate" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Date</label>
+          <input placeholder='News & Event Date...' type="date" id="eventDate" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventDate} onChange={(e) => setEventDate(e.target.value)} required />
         </div>
         <div className='mb-5'>
           <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="eventImage">Upload Image</label>

@@ -21,7 +21,7 @@ function UserRequest({users,onDataChange}) {
         "encryptedData": user.id.encryptedData
     }));
   
-      const url = `http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/user/approvedLogin/${base64EncodedIdObject}`;
+      const url = `${process.env.REACT_APP_API_URL}/api/admin/user/approvedLogin/${base64EncodedIdObject}`;
      const response =  await axios.put(url, 
      {"status": 1},
      { headers: {
