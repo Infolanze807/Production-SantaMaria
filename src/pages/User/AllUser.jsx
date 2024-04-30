@@ -3,30 +3,6 @@ import { HiOutlineDotsVertical } from "react-icons/hi";
 
 function AllUser({users}) {
 
-    const requests = [
-        {
-          first_name: "Jone",
-          last_name: "Deo",
-          email: "jone@gmail.com",
-          date_of_birth: "22/09/2001",
-          location: "Ahmedabad",
-        },
-        {
-          first_name: "Spider",
-          last_name: "Maxwell",
-          email: "spider@gmail.com",
-          date_of_birth: "30/04/2005",
-          location: "Rajkot",
-        },
-        {
-          first_name: "Michle",
-          last_name: "Deo",
-          email: "micher@gmail.com",
-          date_of_birth: "20/04/2025",
-          location: "Gandhinagar",
-        },
-      ];
-
   return (
     <div className="mb-6">
       <div className="bg-clip-border rounded-xl bg-white text-gray-700 border border-blue-gray-100 shadow-sm">
@@ -95,7 +71,7 @@ function AllUser({users}) {
                     {request.email}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {request.dob}
+                  {new Date(request.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
                     {request.bio}

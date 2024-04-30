@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Loader from '../Loader';
 
 function GetCompany() {
     const [companyData, setCompanyData] = useState([]);
@@ -12,10 +15,14 @@ function GetCompany() {
         location: ''
     });
     const [error, setError] = useState('');
+    const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     
     const fetchCompanyData = async () => {
         try {
+            setLoading(true);
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No token found. Please login again.');
@@ -32,6 +39,8 @@ function GetCompany() {
             console.error('Error fetching company data:', error);
             window.alert('Error fetching cpmpany data. Please try again.');
             setError('Error fetching company data. Please try again.');
+        } finally {
+            setLoading(false); // Set loading back to false after fetching data
         }
     };
 
@@ -60,6 +69,7 @@ function GetCompany() {
             if (window.confirm("Are you sure you want to delete?")) {
               // If the user clicks "Yes", perform the deletion logic here
               try {
+                setDeleteLoadingId(companyId);
                 const token = localStorage.getItem('token');
                 if (!token) {
                     throw new Error('No token found. Please login again.');
@@ -78,15 +88,18 @@ function GetCompany() {
         
                 if (response.status === 200) {
                     fetchCompanyData()
-                    window.alert("Company deleted successfully.");
+                    // window.alert("Company deleted successfully.");
+                    toast.success('Company deleted successfully.');
                 }   
                 
             } catch (error) {
                 console.error('Error deleting company:', error);
                 console.error('Error response from server:', error.response?.data); // Log the response data directly
                 window.alert('Error deleting company. Please try again.');
-            }
-              console.log("Item deleted");  // This would be replaced with actual deletion logic
+            }  finally {
+                setDeleteLoadingId(null); // Set loading state to false after API call completes
+            } 
+            //   console.log("Item deleted");  // This would be replaced with actual deletion logic
             } else {
               // If the user clicks "No", simply close the dialog
               console.log("Deletion cancelled");  // This line is optional, for debugging
@@ -115,6 +128,7 @@ function GetCompany() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setLoadingUpdate(true);
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No token found. Please login again.');
@@ -133,7 +147,8 @@ function GetCompany() {
             });
 
             if (response.status === 200) {
-                window.alert("User Updated Successfully");
+                // window.alert("User Updated Successfully");
+                toast.success('Company Updated Successfully');
                 fetchCompanyData()  
                 handleCloseClick()
              } setSelectedCompany(null); // Close the modal after updating
@@ -141,6 +156,8 @@ function GetCompany() {
         } catch (error) {
             console.error('Error updating company:', error);
             console.error('Error response from server:', error.response?.data); // Log the response data directly
+        } finally {
+            setLoadingUpdate(false);
         }
     };
 
@@ -150,6 +167,7 @@ function GetCompany() {
 
     return (
         <div>
+        {loading && <Loader />}
             {companyData.map(company => (
                 <div key={company.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
                     <div className='col-span-2 relative'>
@@ -169,7 +187,7 @@ function GetCompany() {
                     </div>
                     <div className='lg:flex lg:flex-col mx-auto gap-2 pt-4 lg:pt-0'>
                         <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(company)}>View</button>
-                        <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" onClick={() => handleDeleteClick(company.id)}>Delete</button>
+                        <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" disabled={deleteLoadingId === company.id} onClick={() => handleDeleteClick(company.id)}>{deleteLoadingId === company.id ? 'Deleting...' : 'Delete'}</button>
                     </div>
                 </div>
             ))}
@@ -208,7 +226,7 @@ function GetCompany() {
                             </div>
                             <div className="flex items-center justify-end space-x-4">
                                 <button type="button" onClick={handleCloseClick} className="border border-gray-300 text-gray-900 dark:text-white rounded-lg px-6 py-2">Cancel</button>
-                                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2">Update</button>
+                                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
                             </div>
                         </form>
                     </div>

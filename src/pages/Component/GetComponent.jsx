@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Loader from '../Loader';
 
 function GetComponent() {
   const [componentData, setComponentData] = useState([]);
@@ -12,10 +15,14 @@ function GetComponent() {
     icon: null
   });
   const [error, setError] = useState('');
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [loadingUpdate, setLoadingUpdate] = useState(false);
+  const [loading, setLoading] = useState(false);
   // const [token, setToken] = useState('');
 
   const fetchComponentData = async () => {
     try {
+      setLoading(true);
       const storedToken = localStorage.getItem('token');
       if (!storedToken) {
         throw new Error('No token found. Please login again.');
@@ -32,7 +39,9 @@ function GetComponent() {
       console.error('Error fetching component data:', error);
       window.alert('Error fetching component data. Please try again.');
       setError('Error fetching component data. Please try again.');
-    }
+    } finally {
+      setLoading(false); // Set loading back to false after fetching data
+  }
   };
 
   useEffect(() => {
@@ -57,6 +66,7 @@ function GetComponent() {
   const handleDeleteClick = async (componentId) => {
     if (window.confirm("Are you sure you want to delete?")) {
         try {
+          setDeleteLoadingId(componentId);
           const token = localStorage.getItem('token');
           if (!token) {
               throw new Error('No token found. Please login again.');
@@ -74,14 +84,17 @@ function GetComponent() {
       });
       if (response.status === 200) {
         fetchComponentData()
-        window.alert("Component deleted successfully.");
+        // window.alert("Component deleted successfully.");
+        toast.success('Component deleted successfully.');
     } 
   } catch (error) {
     console.error('Error deleting Component:', error);
     console.error('Error response from server:', error.response?.data); // Log the response data directly
     window.alert('Error deleting Component. Please try again.');
-  }
-  console.log("Item deleted");  // This would be replaced with actual deletion logic
+  }  finally {
+    setDeleteLoadingId(null); // Set loading state to false after API call completes
+} 
+  // console.log("Item deleted");  // This would be replaced with actual deletion logic
 } else {
   // If the user clicks "No", simply close the dialog
   console.log("Deletion cancelled");  // This line is optional, for debugging
@@ -100,6 +113,7 @@ function GetComponent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoadingUpdate(true);
       const token = localStorage.getItem('token');
       if (!token) {
           throw new Error('No token found. Please login again.');
@@ -118,7 +132,8 @@ function GetComponent() {
       });
 
       if (response.status === 200) {
-        window.alert("User Updated Successfully");
+        // window.alert("User Updated Successfully");
+        toast.success('Component Updated Successfully');
         fetchComponentData()  
         handleCloseClick()
      } setSelectedComponent(null); // Close the modal after updating
@@ -128,28 +143,41 @@ function GetComponent() {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
       window.alert("Error updating component")
-    }
+    } finally {
+      setLoadingUpdate(false);
+  }
   };
 
+  const replaceLocalhost = (url) => {
+    return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
+};
+
   return (
-    <div>
-      {componentData.map(component => (
-        <div key={component.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
-          <div className='col-span-2'>
-            {component.profile_image && <img className='w-full object-cover rounded-lg' src={component.profile_image} alt="" />}
-            {component.cover_image && <img className='w-full object-cover rounded-lg' src={component.cover_image} alt="" />}
-            {component.icon && <img className='w-full object-cover rounded-lg' src={component.icon} alt="" />}
+    <div className='pb-7'>
+    {loading && <Loader />}
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
+        {componentData.map(component => (
+          <div key={component.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
+          <div className='relative'>
+            <div className='pt-11'>
+                <img className='-z-10 w-full object-cover rounded-lg' src={replaceLocalhost(component.cover_image)} alt="cover" />
+            </div>
+            <div className='absolute border-2 border-white rounded-full left-1/2 transform -translate-x-1/2 top-0'>
+                <img className='w-20 h-20 rounded-full object-cover' src={replaceLocalhost(component.profile_image)} alt="profile" />
+            </div>
           </div>
-          <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
-            <div>Name: &nbsp;<span className='font-normal'>{component.name}</span></div>
-            <div>Description: &nbsp;<span className='font-normal'>{component.description}</span></div>
+            <div className="p-6 py-0 px-1 pt-5">
+              <p className="block antialiased font-sans text-sm text-gray-900 font-semibold">Name: &nbsp;<span className='font-normal'>{component.name}</span></p>
+              <div className='text-sm pt-1 text-gray-900 font-semibold'>Description: &nbsp;<span className='font-normal'>{component.description}</span></div>
+          <div className='flex items-center text-sm text-gray-900 font-semibold pt-1'>Icon: &nbsp;<img className='object-cover rounded-full w-8 h-8' src={replaceLocalhost(component.icon)} alt="icon" /></div>
+            </div>
+            <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
+              <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(component)}>View</button>
+              <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" disabled={deleteLoadingId === component.id} onClick={() => handleDeleteClick(component.id)}>{deleteLoadingId === component.id ? 'Deleting...' : 'Delete'}</button>
+            </div>
           </div>
-          <div className='lg:flex lg:flex-col mx-auto gap-2 pt-4 lg:pt-0'>
-            <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(component)}>View</button>
-            <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" onClick={() => handleDeleteClick(component.id)}>Delete</button>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
       {selectedComponent && (
         <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
@@ -177,7 +205,7 @@ function GetComponent() {
               </div>
               <div className="flex items-center justify-end space-x-4">
                 <button type="button" onClick={handleCloseClick} className="border border-gray-300 text-gray-900 dark:text-white rounded-lg px-6 py-2">Cancel</button>
-                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2">Update</button>
+                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
               </div>
             </form>
           </div>

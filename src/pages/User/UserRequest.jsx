@@ -1,10 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { HiOutlineDotsVertical } from "react-icons/hi";
 import axios from "axios";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function UserRequest({users,onDataChange}) {
+
+  const [userLoadingId, setUserLoadingId] = useState(null);
+
   const handleApprove = async(user) => {
     try {
+      setUserLoadingId(user);
       const token = localStorage.getItem('token');
       if (!token) {
           throw new Error('No token found. Please login again.');
@@ -25,15 +31,18 @@ function UserRequest({users,onDataChange}) {
       console.log(response)
       if (response.status === 200) {
           
-          window.alert("User Approved successfully.");
+          // window.alert("User Approved successfully.");
+          toast.success('User Approved successfully.');
            onDataChange();  
         
       }   
   } catch (error) {
       window.alert("Error deleting company:",error)
       console.error('Error deleting company:', error);   
-  }
-  }
+  }  finally {
+    setUserLoadingId(null); // Set loading state to false after API call completes
+} 
+  };
 
   return (
     <div className="mb-6">
@@ -108,7 +117,7 @@ function UserRequest({users,onDataChange}) {
                     {user.email}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
-                    {user.dob}
+                  {new Date(user.dob).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}
                   </td>
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm">
                     {user.bio}
@@ -118,8 +127,8 @@ function UserRequest({users,onDataChange}) {
                   </td>
 
                   <td className="py-3 px-5 border-b border-blue-gray-50 text-sm text-center">
-                    <button className="bg-green-500 px-5 p-2 rounded-full text-white" onClick={() => handleApprove(user)}>
-                      Accept
+                    <button className="bg-green-500 px-5 p-2 rounded-full text-white" disabled={userLoadingId === user} onClick={() => handleApprove(user)}>
+                    {userLoadingId === user ? 'Accepting...' : 'Accept'}
                     </button>
                     {/* <button className="bg-red-500 px-5 p-2 rounded-full text-white">
                       Reject

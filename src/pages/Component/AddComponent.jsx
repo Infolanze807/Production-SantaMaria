@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddComponent() {
   const [formData, setFormData] = useState({
@@ -11,13 +14,18 @@ function AddComponent() {
   });
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
+    } else {
+      navigate('/sign-in');
+      alert("Token is not valid. Please login first.");
     }
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => {
     if (e.target.name === 'profile_image' || e.target.name === 'cover_image' || e.target.name === 'icon') {
@@ -30,6 +38,7 @@ function AddComponent() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description);
@@ -54,13 +63,16 @@ function AddComponent() {
         });
      
         // Optionally, alert the user
-        window.alert('Component added successfully.');
+        // window.alert('Component added successfully.');
+        toast.success('Component added successfully.');
     }
       console.log(response.data);
   
     } catch (error) {
       console.error('Error adding component:', error);
       setError('Error adding component. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false after data submission
     }
   };
   
@@ -90,7 +102,7 @@ function AddComponent() {
             <input onChange={handleChange} type="file" id="icon" name="icon" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
           </div>
           <div className=''>
-            <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
+            <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
             {error && <div className="text-red-600">{error}</div>}
           </div>
         </form>

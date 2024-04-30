@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Loader from '../Loader';
 
 function GetEmergency() {
     const [emergencyData, setEmergencyData] = useState([]);
@@ -11,9 +14,13 @@ function GetEmergency() {
         cover_image: null
     });
     const [error, setError] = useState('');
+    const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const fetchEmergencyData = async () => {
         try {
+            setLoading(true);
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No token found. Please login again.');
@@ -30,6 +37,8 @@ function GetEmergency() {
             console.error('Error fetching emergency data:', error);
             window.alert('Error fetching emergency data. Please try again.');
             setError('Error fetching emergency data. Please try again.');
+        } finally {
+            setLoading(false); // Set loading back to false after fetching data
         }
     };
 
@@ -55,6 +64,7 @@ function GetEmergency() {
         if (window.confirm("Are you sure you want to delete?")) {
             
         try {
+            setDeleteLoadingId(emergencyId);
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No token found. Please login again.');
@@ -74,32 +84,43 @@ function GetEmergency() {
 
             if (response.status === 200) {
                 fetchEmergencyData()
-                window.alert("Contact deleted successfully.");
+                // window.alert("Contact deleted successfully.");
+                toast.success('Contact deleted successfully.');
             } 
 
         } catch (error) {
             console.error('Error deleting Contact:', error);
             console.error('Error response from server:', error.response?.data); // Log the response data directly
             window.alert('Error deleting Contact. Please try again.');
-        }
-          console.log("Item deleted");  // This would be replaced with actual deletion logic
+        }   finally {
+            setDeleteLoadingId(null); // Set loading state to false after API call completes
+        } 
+        //   console.log("Item deleted");  // This would be replaced with actual deletion logic
         } else {
           // If the user clicks "No", simply close the dialog
           console.log("Deletion cancelled");  // This line is optional, for debugging
-        }
+        } 
 };
 
 const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
-  };
+    if (name === 'profile_image' || name === 'cover_image') {
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: e.target.files[0]
+        }));
+    } else {
+        setFormData(prevData => ({
+            ...prevData,
+            [name]: value
+        }));
+    }
+};
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setLoadingUpdate(true);
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No token found. Please login again.');
@@ -118,8 +139,9 @@ const handleChange = (e) => {
 
             // After updating, fetch updated emergency data
             if (response.status === 200) {
-                window.alert("User Updated Successfully");
+                // window.alert("User Updated Successfully");
                 // console.log("User Updated Successfully")
+                toast.success('Emergency Contact Updated Successfully');
                 fetchEmergencyData()    
                 handleCloseClick()
              } setSelectedEmergency(null); // Close the modal after updating
@@ -128,6 +150,8 @@ const handleChange = (e) => {
                 console.error('Error updating Contact:', error);
                 console.error('Error response from server:', error.response?.data); // Log the response data directly
                 window.alert("Error updating Contact")
+            } finally {
+                setLoadingUpdate(false);
             }
     };
 
@@ -137,6 +161,7 @@ const handleChange = (e) => {
 
     return (
         <div className='pb-7'>
+        {loading && <Loader />}
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
                 {emergencyData.map(emergency => (
                 <div key={emergency.id.emergencyData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
@@ -154,7 +179,7 @@ const handleChange = (e) => {
                     </div>
                     <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
                     <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(emergency)}>View</button>
-                    <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(emergency.id)}>Delete</button>
+                    <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(emergency.id)} disabled={deleteLoadingId === emergency.id}>{deleteLoadingId === emergency.id ? 'Deleting...' : 'Delete'}</button>
                     </div>
                 </div>
                 ))}
@@ -174,13 +199,13 @@ const handleChange = (e) => {
                             </div>
                             <div className="mb-4">
                                 <label htmlFor="profile_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Image</label>
-                                <input onChange={handleChange} type="file" id="profile_image" name="profile_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                <input onChange={handleChange} type="file" id="profile_image" name="profile_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
                             <div className="mb-4">
                                 <label htmlFor="cover_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cover Image</label>
-                                <input onChange={handleChange} type="file" id="cover_image" name="cover_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                                <input onChange={handleChange} type="file" id="cover_image" name="cover_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200">Update</button>
+                            <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
                         </form>
                         <button onClick={handleCloseClick} className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-200 mt-4">Cancel</button>
                     </div>

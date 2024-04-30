@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Loader from '../Loader';
 
 function GetBanner() {
     const [bannerData, setBannerData] = useState([]);
@@ -9,8 +12,13 @@ function GetBanner() {
         description: '',
         image: null
     });
+    const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+    const [loadingUpdate, setLoadingUpdate] = useState(false);
+    const [loading, setLoading] = useState(false);
+
     const fetchBannerData = async () => {
         try {
+            setLoading(true);
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No token found. Please login again.');
@@ -27,6 +35,8 @@ function GetBanner() {
             console.error('Error fetching banner data:', error);
             window.alert('Error fetching banner data. Please try again.');
             setError('Error fetching banner data. Please try again.');
+        } finally {
+            setLoading(false); // Set loading back to false after fetching data
         }
     };
 
@@ -51,6 +61,7 @@ function GetBanner() {
 
             if (window.confirm("Are you sure you want to delete?")) {
                 try {
+                    setDeleteLoadingId(bannerId);
                     const token = localStorage.getItem('token');
                     if (!token) {
                         throw new Error('No token found. Please login again.');
@@ -68,15 +79,17 @@ function GetBanner() {
             });
             if (response.status === 200) {
                 fetchBannerData()
-                window.alert("Banner deleted successfully.");
+                // window.alert("Banner deleted successfully.");
+                toast.success('Banner deleted successfully.');
             }
     
         } catch (error) {
             console.error('Error deleting Banner:', error);
             console.error('Error response from server:', error.response?.data); // Log the response data directly
             window.alert('Error deleting Banner. Please try again.');
-        }
-          console.log("Item deleted");  // This would be replaced with actual deletion logic
+        } finally {
+            setDeleteLoadingId(null); // Set loading state to false after API call completes
+        } 
         } else {
           // If the user clicks "No", simply close the dialog
           console.log("Deletion cancelled");  // This line is optional, for debugging
@@ -97,6 +110,7 @@ const handleChange = (e) => {
     const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+        setLoadingUpdate(true)
         const token = localStorage.getItem('token');
         if (!token) {
             throw new Error('No token found. Please login again.');
@@ -116,7 +130,8 @@ const handleChange = (e) => {
 
         
         if (response.status === 200) {
-            window.alert("Banner Updated Successfully");
+            // window.alert("Banner Updated Successfully");
+            toast.success('Banner Updated Successfully');
             fetchBannerData()  
             handleCloseClick()
          } setSelectedBanner(null); // Close the modal after updating
@@ -125,27 +140,36 @@ const handleChange = (e) => {
         console.error('Error updating banner:', error);
         console.error('Error response from server:', error.response?.data); // Log the response data directly
         window.alert("Error updating banner")
+    } finally {
+        setLoadingUpdate(false);
     }
+    };
+
+    const replaceLocalhost = (url) => {
+        return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
     };
 
 
     return (
-        <div>
-            {bannerData.map(banner => (
-                <div key={banner.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
-                    <div className='col-span-2'>
-                        <img className='w-full object-cover rounded-lg' src={banner.image} alt="" />
+        <div className='pb-7'>
+            {loading && <Loader />}
+            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
+                {bannerData.map(banner => (
+                <div key={banner.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
+                    <div className="relative bg-clip-border rounded-xl overflow-hidden bg-gray-900 text-white shadow-gray-900/20 shadow-lg mx-0 mt-0 mb-4 h-64 xl:h-40">
+                    <img src={replaceLocalhost(banner.image)} alt={banner.title} className="h-full w-full object-cover" />
                     </div>
-                    <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
-                        <div>Name: &nbsp;<span className='font-normal'>{banner.name}</span></div>
-                        <div>Description: &nbsp;<span className='font-normal'>{banner.description}</span></div>
+                    <div className="p-6 py-0 px-1">
+                    <p className="block antialiased tracking-normal font-sans font-semibold text-sm leading-snug text-gray-900 mt-1 mb-2">Title: &nbsp;<span className='font-normal'>{banner.name}</span></p>
+                    <p className="block antialiased font-sans text-sm leading-normal font-semibold text-gray-900">Description: &nbsp;<span className='font-normal'>{banner.description}</span></p>
                     </div>
-                    <div className='lg:flex lg:flex-col mx-auto gap-2 pt-4 lg:pt-0'>
-                        <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(banner)}>View</button>
-                        <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" onClick={() => handleDeleteClick(banner.id)}>Delete</button>
+                    <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
+                    <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(banner)}>View</button>
+                    <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(banner.id)} disabled={deleteLoadingId === banner.id}>{deleteLoadingId === banner.id ? 'Loading...' : 'Delete'}</button>
                     </div>
                 </div>
-            ))}
+                ))}
+            </div>
             {selectedBanner && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
@@ -165,7 +189,7 @@ const handleChange = (e) => {
                             </div>
                             <div className="flex items-center justify-end space-x-4">
                                 <button type="button" onClick={handleCloseClick} className="border border-gray-300 text-gray-900 dark:text-white rounded-lg px-6 py-2">Cancel</button>
-                                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2">Update</button>
+                                <button type="submit" className="bg-blue-500 text-white rounded-lg px-6 py-2" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
                             </div>
                         </form>
                     </div>

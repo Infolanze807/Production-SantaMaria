@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddBanner() {
   const [name, setName] = useState('');
@@ -7,17 +10,23 @@ function AddBanner() {
   const [image, setImage] = useState(null);
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
+    } else {
+      navigate('/sign-in');
+      alert("Token is not valid. Please login first.");
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const formDataToSend = new FormData();
       formDataToSend.append('name', name);
       formDataToSend.append('description', description);
@@ -33,15 +42,16 @@ function AddBanner() {
         // Clear form fields
         setName('');
         setDescription('');
-        setImage(null); // Clear image state
-        // Optionally, alert the user
-        window.alert('Banner added successfully.');
+        setImage(null);
+        toast.success('Banner added successfully.');
       }
       console.log(response.data);
     } catch (error) {
       console.error('Error adding banner:', error);
       setError('Error adding banner. Please try again.');
       window.alert('Error adding banner. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false after data submission
     }
   };
 
@@ -61,7 +71,7 @@ function AddBanner() {
             <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
             <input type="file" id="image" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[--second-color] focus:border-[--second-color] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-[--second-color] dark:focus:border-[--second-color]" onChange={(e) => setImage(e.target.files[0])} required />
           </div>
-          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
+          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
           {/* Display error message if there's an error */}
           {error && <div className="text-red-600">{error}</div>}
         </form>

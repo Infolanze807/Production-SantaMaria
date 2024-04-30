@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddEmergency() {
     const [formData, setFormData] = useState({
@@ -12,6 +14,7 @@ function AddEmergency() {
     const [error, setError] = useState('');
     const [token, setToken] = useState('');
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
@@ -34,6 +37,7 @@ function AddEmergency() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            setLoading(true);
             const formDataToSend = new FormData();
             formDataToSend.append('name', formData.name);
             formDataToSend.append('contact_no', formData.contact_no);
@@ -54,13 +58,16 @@ function AddEmergency() {
                 profile_image: null,
                 cover_image: null
             });
-            window.alert('Emergency contact added successfully!');
+            // window.alert('Emergency contact added successfully!');
+            toast.success('Emergency contact added successfully.');
         }
         console.log(response.data)
     } catch (error) {
         console.error('Error adding Contact:', error) ;
         setError('Error adding Contact. Please try again.');
         window.alert('Error adding Contact. Please try again.');
+      } finally {
+        setLoading(false); // Set loading to false after data submission
       }
     };
 
@@ -117,7 +124,7 @@ function AddEmergency() {
                         />
                     </div>
                     <div className=''>
-                        <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
+                        <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
                     </div>
                 </form>
             </div>

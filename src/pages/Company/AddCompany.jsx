@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AddCompany() {
   const [companyName, setCompanyName] = useState('');
@@ -13,6 +15,7 @@ function AddCompany() {
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -27,6 +30,7 @@ function AddCompany() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const formData = new FormData();
       formData.append('name', companyName);
       formData.append('bio', companyBio);
@@ -54,13 +58,16 @@ function AddCompany() {
         setError('');
      
         // Optionally, alert the user
-        window.alert('Company added successfully.');
+        // window.alert('Company added successfully.');
+        toast.success('Company added successfully.');
     }
       console.log(response.data);
     } catch (error) {
       console.error('Error adding company:', error);
       setError('Error adding company. Please try again.');    
       window.alert('Error adding company. Please try again.');
+    } finally {
+      setLoading(false); // Set loading to false after data submission
     }
   };
 
@@ -96,7 +103,7 @@ function AddCompany() {
             <label htmlFor="coverImage" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cover Image</label>
             <input type="file" id="coverImage" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[--second-color] focus:border-[--second-color] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-[--second-color] dark:focus:border-[--second-color]" onChange={(e) => setCoverImage(e.target.files[0])} required />
           </div>
-          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">Submit</button>
+          <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
           {/* Display error message if there's an error */}
           {error && <div className="text-red-600">{error}</div>}
         </form>

@@ -33,30 +33,6 @@ function GetDiscount() {
       image: '/img/home-decor-2.jpeg',
       date: '2024-04-22',
     },
-    
-    {
-      id: 2,
-      title: 'Micle Jecson',
-      company_id: '963258741965',
-      image: '/img/home-decor-2.jpeg',
-      date: '2024-04-22',
-    },
-    
-    {
-      id: 2,
-      title: 'Micle Jecson',
-      company_id: '963258741965',
-      image: '/img/home-decor-2.jpeg',
-      date: '2024-04-22',
-    },
-    
-    {
-      id: 2,
-      title: 'Micle Jecson',
-      company_id: '963258741965',
-      image: '/img/home-decor-2.jpeg',
-      date: '2024-04-22',
-    },
   ];
 
   const [editingDiscount, setEditingDiscount] = useState(null);
