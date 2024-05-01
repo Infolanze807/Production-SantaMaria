@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
+import { useNavigate } from 'react-router-dom';
 
 function GetComponent() {
   const [apiResponse, setApiResponse] = useState(null);
@@ -19,11 +20,10 @@ function GetComponent() {
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   // const [token, setToken] = useState('');
 
-  const URL = `${process.env.REACT_APP_API_URL}/api/admin/component?limit=5&page=1`
-
-  const fetchComponentData = async (URL) => {
+  const fetchComponentData = async () => {
     try {
       setLoading(true);
       const storedToken = localStorage.getItem('token');
@@ -31,7 +31,7 @@ function GetComponent() {
         throw new Error('No token found. Please login again.');
       }
 
-      const response = await axios.get(URL, {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/component`, {
         headers: {
           Authorization: `Bearer ${storedToken}`
         }
@@ -43,34 +43,18 @@ function GetComponent() {
       // setToken(storedToken);
     } catch (error) {
       console.error('Error fetching component data:', error);
-      window.alert('Error fetching component data. Please try again.');
-      setError('Error fetching component data. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert('Error fetching component data. Please try again.');
+        setError('Error fetching component data. Please try again.');
+      }
     } finally {
       setLoading(false); // Set loading back to false after fetching data
   }
   };
-
-  const replaceLocalhost = (url) => {
-    return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
-};
-
-const handleNext = async() => {
-  if (apiResponse && apiResponse.next) {
-   const nexturl = await replaceLocalhost(apiResponse.next)
-   console.log(nexturl,"next")
-   fetchComponentData(nexturl);
- }
-};
-
-console.log(apiResponse,"checks")
-
-   const handlePrevious = async() => {
-    if (apiResponse && apiResponse.previous) {
-        const previousurl = await replaceLocalhost(apiResponse.previous);
-        console.log(previousurl, "previous");
-        fetchComponentData(previousurl);
-    }
-};
 
   useEffect(() => {
     fetchComponentData(URL);
@@ -90,6 +74,7 @@ console.log(apiResponse,"checks")
   const handleCloseClick = () => {
     setSelectedComponent(null);
   };
+
 
   const handleDeleteClick = async (componentId) => {
     if (window.confirm("Are you sure you want to delete?")) {
@@ -111,7 +96,7 @@ console.log(apiResponse,"checks")
         }
       });
       if (response.status === 200) {
-        fetchComponentData(URL)
+        fetchComponentData()
         // window.alert("Component deleted successfully.");
         toast.success('Component deleted successfully.');
     } 
@@ -129,6 +114,7 @@ console.log(apiResponse,"checks")
 }
 
   };
+  
 
   const handleChange = (e) => {
     if (e.target.name === 'profile_image' || e.target.name === 'cover_image' || e.target.name === 'icon') {
@@ -144,25 +130,24 @@ console.log(apiResponse,"checks")
       setLoadingUpdate(true);
       const token = localStorage.getItem('token');
       if (!token) {
-          throw new Error('No token found. Please login again.');
+        throw new Error('No token found. Please login again.');
       }
-
+  
       const base64EncodedIdObject = btoa(JSON.stringify({
         "iv": selectedComponent.id.iv,
         "encryptedData": selectedComponent.id.encryptedData
       }));
-
+  
       const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/component/${base64EncodedIdObject}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-       Authorization: `Bearer ${token}`
-   }
+          Authorization: `Bearer ${token}`
+        }
       });
-
+  
       if (response.status === 200) {
-        // window.alert("User Updated Successfully");
         toast.success('Component Updated Successfully');
-        fetchComponentData(URL)  
+        fetchComponentData()  
         handleCloseClick()
      } setSelectedComponent(null); // Close the modal after updating
 
@@ -170,10 +155,16 @@ console.log(apiResponse,"checks")
     } catch (error) {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
-      window.alert("Error updating component")
+      setLoadingUpdate(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert("Error updating component");
+      }
     } finally {
       setLoadingUpdate(false);
-  }
+    }
   };
 
   

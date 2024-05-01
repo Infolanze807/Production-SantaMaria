@@ -31,15 +31,15 @@ function AddBanner() {
       formDataToSend.append('name', name);
       formDataToSend.append('description', description);
       formDataToSend.append('image', image);
-
+  
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/banner`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         }
       });
+  
       if (response.status === 201) {
-        // Clear form fields
         setName('');
         setDescription('');
         setImage(null);
@@ -48,12 +48,18 @@ function AddBanner() {
       console.log(response.data);
     } catch (error) {
       console.error('Error adding banner:', error);
-      setError('Error adding banner. Please try again.');
-      window.alert('Error adding banner. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert('Error adding banner. Please try again.');
+      }
     } finally {
-      setLoading(false); // Set loading to false after data submission
+      setLoading(false);
     }
   };
+  
 
   return (
     <div>

@@ -52,6 +52,7 @@ function AddComponent() {
           Authorization: `Bearer ${token}`
         }
       });
+  
       if (response.status === 201) {
         // Clear form fields
         setFormData({
@@ -65,16 +66,24 @@ function AddComponent() {
         // Optionally, alert the user
         // window.alert('Component added successfully.');
         toast.success('Component added successfully.');
-    }
+      }
       console.log(response.data);
   
     } catch (error) {
       console.error('Error adding component:', error);
-      setError('Error adding component. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        setError('Error adding component. Please try again.');
+        window.alert('Error adding component. Please try again.');
+      }
     } finally {
-      setLoading(false); // Set loading to false after data submission
+      setLoading(false);
     }
   };
+  
   
 
   return (

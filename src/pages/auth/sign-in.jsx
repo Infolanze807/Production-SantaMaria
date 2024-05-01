@@ -15,6 +15,7 @@ export function SignIn() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (location.pathname === "/sign-in") {
@@ -25,6 +26,7 @@ export function SignIn() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
+      setLoading(true);
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/login`, {
         email,
         password
@@ -38,6 +40,8 @@ export function SignIn() {
     } catch (error) {
       console.error('Error during login:', error);
       setError('Invalid email or password.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -97,8 +101,8 @@ export function SignIn() {
             }
             containerProps={{ className: "-ml-2.5" }}
           />
-          <Button className="mt-6" fullWidth type="submit">
-            Sign In
+          <Button className="mt-6" fullWidth type="submit" disabled={loading}>
+            {loading ? "Signing In.." : "Sign In"}
           </Button>
           {/* <Link to="/dashboard/home" className="mt-6"><Button className="mt-6" fullWidth>
             Sign In
