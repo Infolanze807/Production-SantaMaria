@@ -4,6 +4,7 @@ import { FaRegStar } from "react-icons/fa";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
+import { useNavigate } from 'react-router-dom';
 
 function AllEvent() {
   const [apiResponse, setApiResponse] = useState(null);
@@ -20,6 +21,7 @@ function AllEvent() {
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=5&page=1`
 
@@ -30,31 +32,37 @@ function AllEvent() {
       if (!storedToken) {
         throw new Error('No token found. Please login again.');
       }
-
+  
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${storedToken}`
         }
       });
-      //const events = response.data.data.data.filter(item => item.type === 'Event');
-      // events.sort((a, b) => b.isFeatured - a.isFeatured || new Date(b.published_date) - new Date(a.published_date));
       console.log(response.data.data,"apidetails")
       setApiResponse(response.data.data);
       setEventData(response.data.data.data);
     } catch (error) {
       console.error('Error fetching News and Event data:', error);
       setError('Error fetching News and Event data. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      }
     } finally {
       setLoading(false); // Set loading back to false after fetching data
-  }
+    }
   };
+
   const replaceLocalhost = (url) => {
     return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
 };
+
 const replacePagehost = (url) => {
   return url.replace("http://localhost:5000/api/admin/news_and_event", `${process.env.REACT_APP_API_URL}/api/admin/newsandevent`);
 };
-  const handleNext = () => {
+
+const handleNext = () => {
      if (apiResponse && apiResponse.next) {
       const nexturl = replacePagehost(apiResponse.next)
       console.log(nexturl,"next")
@@ -90,6 +98,8 @@ const handlePrevious = () => {
   };
 
   const handleDeleteClick = async (eventId) => {
+    const navigate = useNavigate(); // Use the useNavigate hook
+  
     if (window.confirm("Are you sure you want to delete?")) {
       try {
         setDeleteLoadingId(eventId);
@@ -97,12 +107,12 @@ const handlePrevious = () => {
         if (!token) {
           throw new Error('No token found. Please login again.');
         }
-
+  
         const base64EncodedIdObject = btoa(JSON.stringify({
           "iv": eventId.iv,
           "encryptedData": eventId.encryptedData
         }));
-
+  
         const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -110,19 +120,23 @@ const handlePrevious = () => {
         });
         if (response.status === 200) {
           fetchEventData(URL);
-          // window.alert("News and Event deleted successfully.");
           toast.success('News or Event deleted successfully.');
         }
       } catch (error) {
         console.error('Error deleting News and Event:', error);
-        console.error('Error response from server:', error.response?.data); // Log the response data directly
-    } finally {
-      setDeleteLoadingId(null); // Set loading state to false after API call completes
-  } 
-      // console.log("Item deleted");  // This would be replaced with actual deletion logic
+        console.error('Error response from server:', error.response?.data);
+        setDeleteLoadingId(null);
+        if (error.response && error.response.status === 500) {
+          window.alert('Token is expired, Please sign in again');
+          navigate('/sign-in');
+        } else {
+          window.alert('Error deleting News and Event. Please try again.');
+        }
+      } finally {
+        setDeleteLoadingId(null);
+      }
     } else {
-      // If the user clicks "No", simply close the dialog
-      console.log("Deletion cancelled");  // This line is optional, for debugging
+      console.log("Deletion cancelled");  
     }
   };
 
@@ -144,32 +158,37 @@ const handlePrevious = () => {
       if (!token) {
         throw new Error('No token found. Please login again.');
       }
-
+  
       const base64EncodedIdObject = btoa(JSON.stringify({
         "iv": selectedEvent.id.iv,
         "encryptedData": selectedEvent.id.encryptedData
-    }));
-
-    const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-     Authorization: `Bearer ${token}`
- }
-    });
-
-        if (response.status === 200) {
-          // window.alert("News and Event updated successfully.");
-          toast.success('News or Event Updated Successfully');
-          fetchEventData(URL);
-          handleCloseClick();
-        }setSelectedEvent(null)
-
+      }));
+  
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent/${base64EncodedIdObject}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      });
+  
+      if (response.status === 200) {
+        toast.success('News or Event Updated Successfully');
+        fetchEventData(URL);
+        handleCloseClick();
+      }
+      setSelectedEvent(null);
+  
     } catch (error) {
-      console.error('Error updating component:', error);
+      console.error('Error updating event:', error);
       console.error('Error response from server:', error.response?.data);
+      setLoadingUpdate(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      }
     } finally {
       setLoadingUpdate(false);
-  }
+    }
   };
 
 

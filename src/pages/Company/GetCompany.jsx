@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
+import { useNavigate } from 'react-router-dom';
 
 function GetCompany() {
     const [apiResponse, setApiResponse] = useState(null);
@@ -19,36 +20,43 @@ function GetCompany() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     // const [apiURL, setApiURL] = useState('');
 
     
   const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=1`
 
-    const fetchCompanyData = async (URL) => {
-        try {
-            setLoading(true);
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found. Please login again.');
-            }
-
-            const response = await axios.get(URL, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            console.log(response.data.data,"apidetails")
-            setApiResponse(response.data.data);
-            setCompanyData(response.data.data.data);
-            
-        } catch (error) {
-            console.error('Error fetching company data:', error);
-            window.alert('Error fetching cpmpany data. Please try again.');
-            setError('Error fetching company data. Please try again.');
-        } finally {
-            setLoading(false); // Set loading back to false after fetching data
+  const fetchCompanyData = async (URL) => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found. Please login again.');
+      }
+  
+      const response = await axios.get(URL, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-    };
+      });
+  
+      setApiResponse(response.data.data);
+      setCompanyData(response.data.data.data);
+  
+    } catch (error) {
+      console.error('Error fetching company data:', error);
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert('Error fetching company data. Please try again.');
+        setError('Error fetching company data. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
     const replaceLocalhost = (url) => {
         return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
@@ -92,47 +100,47 @@ function GetCompany() {
     };
 
     const handleDeleteClick = async (companyId) => {
-            // Use window.confirm to show a confirmation dialog
-            if (window.confirm("Are you sure you want to delete?")) {
-              // If the user clicks "Yes", perform the deletion logic here
-              try {
-                setDeleteLoadingId(companyId);
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    throw new Error('No token found. Please login again.');
-                }
-        
-                const base64EncodedIdObject = btoa(JSON.stringify({
-                    "iv": companyId.iv,
-                    "encryptedData": companyId.encryptedData
-                }));
-                
-              const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/company/${base64EncodedIdObject}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
-        
-                if (response.status === 200) {
-                    fetchCompanyData(URL)
-                    // window.alert("Company deleted successfully.");
-                    toast.success('Company deleted successfully.');
-                }   
-                
-            } catch (error) {
-                console.error('Error deleting company:', error);
-                console.error('Error response from server:', error.response?.data); // Log the response data directly
-                window.alert('Error deleting company. Please try again.');
-            }  finally {
-                setDeleteLoadingId(null); // Set loading state to false after API call completes
-            } 
-            //   console.log("Item deleted");  // This would be replaced with actual deletion logic
-            } else {
-              // If the user clicks "No", simply close the dialog
-              console.log("Deletion cancelled");  // This line is optional, for debugging
+        if (window.confirm("Are you sure you want to delete?")) {
+          try {
+            setDeleteLoadingId(companyId);
+            const token = localStorage.getItem('token');
+            if (!token) {
+              throw new Error('No token found. Please login again.');
             }
       
-    };
+            const base64EncodedIdObject = btoa(JSON.stringify({
+              "iv": companyId.iv,
+              "encryptedData": companyId.encryptedData
+            }));
+      
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/company/${base64EncodedIdObject}`, {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            });
+      
+            if (response.status === 200) {
+              fetchCompanyData(URL);
+              toast.success('Company deleted successfully.');
+            }   
+      
+          } catch (error) {
+            console.error('Error deleting company:', error);
+            console.error('Error response from server:', error.response?.data);
+            setDeleteLoadingId(null);
+            if (error.response && error.response.status === 500) {
+              window.alert('Token is expired, Please sign in again');
+              navigate('/sign-in');
+            } else {
+              window.alert('Error deleting company. Please try again.');
+            }
+          } finally {
+            setDeleteLoadingId(null); 
+          } 
+        } else {
+          console.log("Deletion cancelled");
+        }
+      };
 
     
 
@@ -152,43 +160,46 @@ function GetCompany() {
     };
     
     
-    
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            setLoadingUpdate(true);
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found. Please login again.');
+          setLoadingUpdate(true);
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('No token found. Please login again.');
+          }
+      
+          const base64EncodedIdObject = btoa(JSON.stringify({
+            "iv": selectedCompany.id.iv,
+            "encryptedData": selectedCompany.id.encryptedData
+          }));
+      
+          const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/company/${base64EncodedIdObject}`, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`
             }
-
-            const base64EncodedIdObject = btoa(JSON.stringify({
-                "iv": selectedCompany.id.iv,
-                "encryptedData": selectedCompany.id.encryptedData
-            }));
-            
-         const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/company/${base64EncodedIdObject}`, formData, {
-                headers: {
-                       'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (response.status === 200) {
-                // window.alert("User Updated Successfully");
-                toast.success('Company Updated Successfully');
-                fetchCompanyData(URL)  
-                handleCloseClick()
-             } setSelectedCompany(null); // Close the modal after updating
-
+          });
+      
+          if (response.status === 200) {
+            toast.success('Company Updated Successfully');
+            fetchCompanyData(URL);
+            handleCloseClick();
+          }
+          setSelectedCompany(null); 
+      
         } catch (error) {
-            console.error('Error updating company:', error);
-            console.error('Error response from server:', error.response?.data); // Log the response data directly
+          console.error('Error updating company:', error);
+          console.error('Error response from server:', error.response?.data);
+          setLoadingUpdate(false);
+          if (error.response && error.response.status === 500) {
+            window.alert('Token is expired, Please sign in again');
+            navigate('/sign-in');
+          }
         } finally {
-            setLoadingUpdate(false);
+          setLoadingUpdate(false);
         }
-    };
+      };
 
  
 

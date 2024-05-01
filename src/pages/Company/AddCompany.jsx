@@ -39,15 +39,20 @@ function AddCompany() {
       formData.append('location', locationLink);
       formData.append('profile_image', companyImage);
       formData.append('cover_image', coverImage);
-
+  
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found. Please login again.');
+      }
+  
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/company`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
         }
       });
+  
       if (response.status === 201) {
-        // Clear form fields
         setCompanyName('');
         setCompanyBio('');
         setContactNumber('');
@@ -56,21 +61,23 @@ function AddCompany() {
         setCompanyImage(null);
         setCoverImage(null);
         setError('');
-     
-        // Optionally, alert the user
-        // window.alert('Company added successfully.');
         toast.success('Company added successfully.');
-    }
+      }
       console.log(response.data);
     } catch (error) {
       console.error('Error adding company:', error);
-      setError('Error adding company. Please try again.');    
-      window.alert('Error adding company. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        setError('Error adding company. Please try again.');    
+        window.alert('Error adding company. Please try again.');
+      }
     } finally {
-      setLoading(false); // Set loading to false after data submission
+      setLoading(false);
     }
   };
-
   return (
     <div>
       <div className='p-4 py-8 mb-7 bg-[--main-color] bg-clip-border rounded-xl'>

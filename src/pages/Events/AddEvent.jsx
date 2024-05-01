@@ -37,8 +37,8 @@ function AddEvent() {
       formData.append('published_date', eventDate);
       formData.append('image', eventImage);
       formData.append('isFeatured', isFeatured);
-
-        console.log(eventType)
+  
+      console.log(eventType)
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -46,7 +46,6 @@ function AddEvent() {
         }
       });
       if (response.status === 201) {
-        // Clear form fields
         setEventTitle('');
         setEventType('');
         setEventContent('');
@@ -54,17 +53,21 @@ function AddEvent() {
         setEventImage(null);
         setIsFeatured(false);
         setError('');
-        // Optionally, alert the user
-        // window.alert('News and added successfully.');
         toast.success('News or Event added successfully.');
       }
       console.log(response.data);
     } catch (error) {
       console.error('Error adding event:', error);
       setError('Error adding event. Please try again.');
-      window.alert('Error adding event. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert('Error adding event. Please try again.');
+      }
     } finally {
-      setLoading(false); // Set loading to false after data submission
+      setLoading(false);
     }
   };
 
