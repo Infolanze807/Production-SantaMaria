@@ -22,7 +22,7 @@ function GetCompany() {
     // const [apiURL, setApiURL] = useState('');
 
     
-  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=2`
+  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=1`
 
     const fetchCompanyData = async (URL) => {
         try {
@@ -37,7 +37,7 @@ function GetCompany() {
                     Authorization: `Bearer ${token}`
                 }
             });
-            console.log(response.data.data,"apidetailsssssssssss")
+            console.log(response.data.data,"apidetails")
             setApiResponse(response.data.data);
             setCompanyData(response.data.data.data);
             
@@ -51,7 +51,7 @@ function GetCompany() {
     };
 
     const replaceLocalhost = (url) => {
-        return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
+        return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
     };
 
     // const NEW_URL = `${process.env.REACT_APP_API_URL}/api/admin/company`

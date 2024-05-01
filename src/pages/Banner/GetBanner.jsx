@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
 
 function GetBanner() {
+    const [apiResponse, setApiResponse] = useState(null);
     const [bannerData, setBannerData] = useState([]);
     const [selectedBanner, setSelectedBanner] = useState(null);
     const [formData, setFormData] = useState({
@@ -12,11 +13,14 @@ function GetBanner() {
         description: '',
         image: null
     });
+    const [error, setError] = useState('');
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const fetchBannerData = async () => {
+    const URL = `${process.env.REACT_APP_API_URL}/api/admin/banner?limit=5&page=1`
+
+    const fetchBannerData = async (URL) => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
@@ -24,11 +28,13 @@ function GetBanner() {
                 throw new Error('No token found. Please login again.');
             }
 
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/banner`, {
-                headers: {
+            const response = await axios.get(URL, {
+                headers: {          
                     Authorization: `Bearer ${token}`
                 }
             });
+            console.log(response.data.data,"apidetails")
+            setApiResponse(response.data.data);
             setBannerData(response.data.data.data);
             
         } catch (error) {
@@ -40,9 +46,28 @@ function GetBanner() {
         }
     };
 
-        useEffect(() => {
-            fetchBannerData();
-        }, []);
+    const replaceLocalhost = (url) => {
+        return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
+    };
+
+    const handleNext = async() => {
+        if (apiResponse && apiResponse.next) {
+         const nexturl = await replaceLocalhost(apiResponse.next)
+         console.log(nexturl,"next")
+         fetchBannerData(nexturl);
+       }
+   };
+   console.log(apiResponse,"checks")
+   const handlePrevious = async() => {
+    if (apiResponse && apiResponse.previous) {
+        const previousurl = await replaceLocalhost(apiResponse.previous);
+        console.log(previousurl, "previous");
+        fetchBannerData(previousurl);
+    }
+};
+    useEffect(() => {
+        fetchBannerData(URL);
+    }, []);
 
         const handleViewClick = (banner) => {
             setSelectedBanner(banner);
@@ -78,7 +103,7 @@ function GetBanner() {
                 }
             });
             if (response.status === 200) {
-                fetchBannerData()
+                fetchBannerData(URL)
                 // window.alert("Banner deleted successfully.");
                 toast.success('Banner deleted successfully.');
             }
@@ -96,6 +121,8 @@ function GetBanner() {
         }
   
 };
+
+
     
 
 const handleChange = (e) => {
@@ -132,7 +159,7 @@ const handleChange = (e) => {
         if (response.status === 200) {
             // window.alert("Banner Updated Successfully");
             toast.success('Banner Updated Successfully');
-            fetchBannerData()  
+            fetchBannerData(URL)  
             handleCloseClick()
          } setSelectedBanner(null); // Close the modal after updating
 
@@ -145,9 +172,6 @@ const handleChange = (e) => {
     }
     };
 
-    const replaceLocalhost = (url) => {
-        return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
-    };
 
 
     return (
@@ -169,6 +193,10 @@ const handleChange = (e) => {
                     </div>
                 </div>
                 ))}
+            </div>
+            <div className='text-center pt-4'>
+                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
             {selectedBanner && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">

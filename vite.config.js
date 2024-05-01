@@ -9,6 +9,7 @@ export default defineConfig(({ command, mode }) => {
     // Define the environment variable in a way that's accessible within your code
     define: {
       'process.env.REACT_APP_API_URL': JSON.stringify(env.REACT_APP_API_URL),
+      'process.env.REACT_APP_LOCAL_HOST': JSON.stringify(env.REACT_APP_LOCAL_HOST),
     },
     
     // Plugins for Vite
