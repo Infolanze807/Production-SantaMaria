@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Input,
@@ -7,12 +7,20 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import { useNavigate, Link } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/sign-in") {
+      localStorage.removeItem('token');
+    }
+  }, [location.pathname]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
