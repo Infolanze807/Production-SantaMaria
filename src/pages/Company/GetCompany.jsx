@@ -50,7 +50,7 @@ function GetCompany() {
     };
 
     const replacePagehost = (url) => {
-        return url.replace(`${process.env.REACT_APP_API_URL}/api/admin/company`);
+        return url.replace(`${process.env.REACT_APP_API_URL}/api/admin/company`, `${process.env.REACT_APP_API_URL}/api/admin/company`);
       };
 
     const handleNext = () => {
