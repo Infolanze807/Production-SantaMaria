@@ -3,6 +3,7 @@ import UserRequest from '../User/UserRequest';
 import AllUser from '../User/AllUser';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../Loader';
 
 
 function Home() {
@@ -10,6 +11,7 @@ function Home() {
   const [activeTab, setActiveTab] = useState(0);
   const [approvedUsers, setApprovedUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleTabClick = (index) => {
@@ -21,6 +23,7 @@ function Home() {
   const fetchUserData = async () => {
   
     try {
+        setLoading(true);
         const token = localStorage.getItem('token');
         if (!token) {
           navigate("/sign-in");
@@ -36,13 +39,13 @@ function Home() {
           // Set users and filter users from response data
           setUsers(response.data.data.data);
           filterUsers(response.data.data.data);
-          console.log(response.data.data.data);
+          // console.log(response.data.data.data);
       } 
         
     } catch (error) {
         console.error('Error fetching company data:', error);
           if (error.response && error.response.data && error.response.data.code === 500) {
-            window.alert(error.response.data.message)
+            // window.alert(error.response.data.message)
             // console.log("msg", error.response.data.message);
             navigate("/sign-in")
         } 
@@ -52,6 +55,8 @@ function Home() {
         // }
 
         //setError('Error fetching company data. Please try again.');
+    } finally {
+        setLoading(false);
     }
 };
 
@@ -77,8 +82,8 @@ console.log(pending,"pending")
       </div>
       </div>
       <div className="px-6">
-      {activeTab === 0 && <div><UserRequest users={pendingUsers} onDataChange={handleDataChange}/></div>}
-      {activeTab === 1 && <div><AllUser users={approvedUsers}  /></div>}
+      {activeTab === 0 && <div>{loading ? <Loader /> : <UserRequest users={pendingUsers} onDataChange={handleDataChange}/> }</div>}
+      {activeTab === 1 && <div>{loading ? <Loader /> : <AllUser users={approvedUsers}  /> }</div>}
       </div>
     </div>
    </div>

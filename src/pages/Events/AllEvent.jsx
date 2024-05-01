@@ -21,26 +21,34 @@ function AllEvent() {
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1); 
   const navigate = useNavigate();
 
-  const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=5&page=1`
+    const limitPerPage = 5;
+
+  // const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=5&page=1`
+  const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=${limitPerPage}&page=${currentPage}`;
+
 
   const fetchEventData = async (url) => {
     try {
       setLoading(true);
       const storedToken = localStorage.getItem('token');
-      if (!storedToken) {
-        throw new Error('No token found. Please login again.');
+      if (storedToken) {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${storedToken}`
+          }
+        });
+        console.log(response.data.data, "apidetails");
+        setApiResponse(response.data.data);
+        setEventData(response.data.data.data);
+        setTotalPages(Math.ceil(response.data.data.total / limitPerPage));
+      } else {
+        navigate('/sign-in');
+        // window.alert('Token is not valid. Please sign in first.');
       }
-  
-      const response = await axios.get(url, {
-        headers: {
-          Authorization: `Bearer ${storedToken}`
-        }
-      });
-      console.log(response.data.data,"apidetails")
-      setApiResponse(response.data.data);
-      setEventData(response.data.data.data);
     } catch (error) {
       console.error('Error fetching News and Event data:', error);
       setError('Error fetching News and Event data. Please try again.');
@@ -53,34 +61,35 @@ function AllEvent() {
       setLoading(false); // Set loading back to false after fetching data
     }
   };
+  
 
   const replaceLocalhost = (url) => {
     return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
 };
 
-const replacePagehost = (url) => {
-  return url.replace("http://localhost:5000/api/admin/news_and_event", `${process.env.REACT_APP_API_URL}/api/admin/newsandevent`);
-};
+// const replacePagehost = (url) => {
+//   return url.replace("http://localhost:5000/api/admin/news_and_event", `${process.env.REACT_APP_API_URL}/api/admin/newsandevent`);
+// };
 
 const handleNext = () => {
-     if (apiResponse && apiResponse.next) {
-      const nexturl = replacePagehost(apiResponse.next)
-      console.log(nexturl,"next")
-      fetchEventData(nexturl);
-    }
+  if (apiResponse && apiResponse.next) {
+      setCurrentPage(prevPage => prevPage + 1);
+  }
 };
 
 const handlePrevious = () => {
-    if (apiResponse && apiResponse.previous) {
-     const previousurl =  replacePagehost(apiResponse.previous)
-      console.log(apiResponse.previous,"previos")
-      fetchEventData(previousurl);
-    }
+  if (apiResponse && apiResponse.previous) {
+      setCurrentPage(prevPage => prevPage - 1);
+  }
+};
+
+const handlePageClick = (pageNumber) => {
+  setCurrentPage(pageNumber);
 };
 
   useEffect(() => {
     fetchEventData(URL);
-  }, []);
+  }, [currentPage]);
 
   const handleViewClick = (event) => {
     setSelectedEvent(event);
@@ -193,7 +202,7 @@ const handlePrevious = () => {
 
   return (
     <div className='pb-7'>
-    {loading && <Loader />}
+    {loading ? <Loader /> : 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
         {eventData.map(event => (
           <div key={event.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
@@ -201,10 +210,10 @@ const handlePrevious = () => {
               <img src={replaceLocalhost(event.image)} alt={event.title} className="h-full w-full object-cover" />
             </div>
             <div className="p-6 py-0 px-1">
-            <div className='flex items-center justify-between'><h5 className="block antialiased tracking-normal font-sans text-xl font-semibold leading-snug text-blue-gray-900 mt-1 mb-2">{event.title}</h5><FaRegStar /></div>
-              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-500">{event.content}</p>
-              <p className="block antialiased font-sans text-sm leading-normal font-normal text-blue-gray-500">{event.type}</p>
-            <div className='text-sm text-blue-gray-500 pt-2'>Date: {new Date(event.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</div>
+            <div className='flex items-center justify-between'><div className="block antialiased tracking-normal font-sans text-sm font-semibold leading-snug text-blue-gray-900 mt-1">Title: <span className='font-normal'>{event.title}</span></div><FaRegStar /></div>
+              <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Description: <span className='font-normal'>{event.content}</span></p>
+              <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Type: <span className='font-normal'>{event.type}</span></p>
+            <div className='text-sm font-semibold text-blue-gray-900 '>Date: <span className='font-normal'>{new Date(event.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span></div>
             </div>
             <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
               <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleViewClick(event)}>View</button>
@@ -214,10 +223,16 @@ const handlePrevious = () => {
           </div>
         ))}
       </div>
-      <div className='text-center pt-4'>
-          <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
-          <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
-      </div>
+      }
+      <div className='text-center pt-7'>
+                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous || currentPage === 1} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous || currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+                {Array.from({ length: Math.min(totalPages, 3) }, (_, index) => currentPage - 1 + index).map(pageNumber => (
+                    pageNumber > 0 && pageNumber <= totalPages && (
+                        <button key={pageNumber} onClick={() => handlePageClick(pageNumber)} className={`bg-[#2d2d2d] rounded-md p-2 text-sm text-white mx-1 w-8 focus:outline-none ${pageNumber === currentPage ? 'bg-blue-500' : ''}`}>{pageNumber}</button>
+                    )
+                ))}
+                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
+            </div>
       {selectedEvent && (
         <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
@@ -230,7 +245,7 @@ const handlePrevious = () => {
               <div className="mb-4">
               <label htmlFor="eventType" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Type</label>
                 {/* <input value={formData.title} onChange={handleChange} type="text" id="title" name="title" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="News and Event Title..." required /> */}
-                <select id="eventType" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={formData.type} onChange={handleChange} required>
+                <select disabled id="eventType" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={formData.type} onChange={handleChange} required>
                   <option value="Event">Event</option>
                   <option value="News">News</option>
                  </select>

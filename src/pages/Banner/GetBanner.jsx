@@ -18,64 +18,72 @@ function GetBanner() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1); 
     const navigate = useNavigate();
 
-    const URL = `${process.env.REACT_APP_API_URL}/api/admin/banner?limit=5&page=1`
+    const limitPerPage = 5;
+
+
+    // const URL = `${process.env.REACT_APP_API_URL}/api/admin/banner?limit=5&page=1`
+
+    const URL = `${process.env.REACT_APP_API_URL}/api/admin/banner?limit=${limitPerPage}&page=${currentPage}`;
 
     const fetchBannerData = async (URL) => {
         try {
-          setLoading(true);
-          const token = localStorage.getItem('token');
-          if (!token) {
-            throw new Error('No token found. Please login again.');
-          }
-      
-          const response = await axios.get(URL, {
-            headers: {
-              Authorization: `Bearer ${token}`
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            if (token) {
+                const response = await axios.get(URL, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setApiResponse(response.data.data);
+                setBannerData(response.data.data.data);
+                setTotalPages(Math.ceil(response.data.data.total / limitPerPage)); // Calculate total pages
+            } else {
+                navigate('/sign-in');
             }
-          });
-          console.log(response.data.data, "apidetails")
-          setApiResponse(response.data.data);
-          setBannerData(response.data.data.data);
-      
         } catch (error) {
-          console.error('Error fetching banner data:', error);
-          setLoading(false);
-          if (error.response && error.response.status === 500) {
-            window.alert('Token is expired, Please sign in again');
-            navigate('/sign-in');
-          } else {
-            window.alert('Error fetching banner data. Please try again.');
-            setError('Error fetching banner data. Please try again.');
-          }
+            console.error('Error fetching banner data:', error);
+            setLoading(false);
+            if (error.response && error.response.status === 500) {
+                window.alert('Token is expired, Please sign in again');
+                navigate('/sign-in');
+            } else {
+                window.alert('Error fetching banner data. Please try again.');
+                setError('Error fetching banner data. Please try again.');
+            }
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
+    
 
     const replaceLocalhost = (url) => {
         return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
     };
 
-    const handleNext = async() => {
-        if (apiResponse && apiResponse.next) {
-         const nexturl = await replaceLocalhost(apiResponse.next)
-         console.log(nexturl,"next")
-         fetchBannerData(nexturl);
-       }
-   };
-   console.log(apiResponse,"checks")
-   const handlePrevious = async() => {
-    if (apiResponse && apiResponse.previous) {
-        const previousurl = await replaceLocalhost(apiResponse.previous);
-        console.log(previousurl, "previous");
-        fetchBannerData(previousurl);
-    }
-};
     useEffect(() => {
-        fetchBannerData(URL);
-    }, []);
+      fetchBannerData(URL);
+  }, [currentPage]); 
+
+  const handleNext = () => {
+      if (apiResponse && apiResponse.next) {
+          setCurrentPage(prevPage => prevPage + 1);
+      }
+  };
+
+  const handlePrevious = () => {
+      if (apiResponse && apiResponse.previous) {
+          setCurrentPage(prevPage => prevPage - 1);
+      }
+  };
+
+  const handlePageClick = (pageNumber) => {
+      setCurrentPage(pageNumber);
+  };
 
         const handleViewClick = (banner) => {
             setSelectedBanner(banner);
@@ -192,7 +200,7 @@ const handleSubmit = async (e) => {
 
     return (
         <div className='pb-7'>
-            {loading && <Loader />}
+            {loading ? <Loader /> : 
             <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
                 {bannerData.map(banner => (
                 <div key={banner.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
@@ -210,9 +218,15 @@ const handleSubmit = async (e) => {
                 </div>
                 ))}
             </div>
-            <div className='text-center pt-4'>
-                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
-                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
+            }
+            <div className='text-center pt-7'>
+                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous || currentPage === 1} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous || currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+                {Array.from({ length: Math.min(totalPages, 3) }, (_, index) => currentPage - 1 + index).map(pageNumber => (
+                    pageNumber > 0 && pageNumber <= totalPages && (
+                        <button key={pageNumber} onClick={() => handlePageClick(pageNumber)} className={`bg-[#2d2d2d] rounded-md p-2 text-sm text-white mx-1 w-8 focus:outline-none ${pageNumber === currentPage ? 'bg-blue-500' : ''}`}>{pageNumber}</button>
+                    )
+                ))}
+                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
             {selectedBanner && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">

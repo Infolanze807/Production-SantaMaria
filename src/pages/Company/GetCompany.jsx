@@ -20,29 +20,33 @@ function GetCompany() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1); 
     const navigate = useNavigate();
-    // const [apiURL, setApiURL] = useState('');
+    const limitPerPage = 5;
 
     
-  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=1`
+  // const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=1`
+  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=${limitPerPage}&page=${currentPage}`;
+
 
   const fetchCompanyData = async (URL) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found. Please login again.');
+      if (token) {
+        const response = await axios.get(URL, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        setApiResponse(response.data.data);
+        setCompanyData(response.data.data.data);
+        setTotalPages(Math.ceil(response.data.data.total / limitPerPage));
+      } else {
+        navigate('/sign-in');
+        // window.alert('Token is not valid. Please sign in first.');
       }
-  
-      const response = await axios.get(URL, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-  
-      setApiResponse(response.data.data);
-      setCompanyData(response.data.data.data);
-  
     } catch (error) {
       console.error('Error fetching company data:', error);
       setLoading(false);
@@ -57,6 +61,7 @@ function GetCompany() {
       setLoading(false);
     }
   };
+  
 
     const replaceLocalhost = (url) => {
         return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
@@ -64,25 +69,25 @@ function GetCompany() {
 
     // const NEW_URL = `${process.env.REACT_APP_API_URL}/api/admin/company`
 
-    const handleNext = async() => {
-        if (apiResponse && apiResponse.next) {
-         const nexturl = await replaceLocalhost(apiResponse.next)
-         console.log(nexturl,"next")
-         fetchCompanyData(nexturl);
-       }
-   };
-   console.log(apiResponse,"checks")
-   const handlePrevious = async() => {
-    if (apiResponse && apiResponse.previous) {
-        const previousurl = await replaceLocalhost(apiResponse.previous);
-        console.log(previousurl, "previous");
-        fetchCompanyData(previousurl);
-    }
-};
+    const handleNext = () => {
+      if (apiResponse && apiResponse.next) {
+          setCurrentPage(prevPage => prevPage + 1);
+      }
+    };
+    
+    const handlePrevious = () => {
+      if (apiResponse && apiResponse.previous) {
+          setCurrentPage(prevPage => prevPage - 1);
+      }
+    };
+    
+    const handlePageClick = (pageNumber) => {
+      setCurrentPage(pageNumber);
+    };
 
     useEffect(() => {
         fetchCompanyData(URL);
-    }, []);
+    }, [currentPage]);
 
     const handleViewClick = (company) => {
         setSelectedCompany(company);
@@ -205,7 +210,8 @@ function GetCompany() {
 
     return (
         <div>
-        {loading && <Loader />}
+        {loading ? <Loader /> : 
+            <div>
             {companyData.map(company => (
                 <div key={company.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
                     <div className='col-span-2 relative'>
@@ -229,9 +235,16 @@ function GetCompany() {
                     </div>
                 </div>
             ))}
-            <div className='text-center pb-4'>
-                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
-                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
+            </div>
+            }
+            <div className='text-center pb-7 pt-2'>
+                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous || currentPage === 1} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous || currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+                {Array.from({ length: Math.min(totalPages, 3) }, (_, index) => currentPage - 1 + index).map(pageNumber => (
+                    pageNumber > 0 && pageNumber <= totalPages && (
+                        <button key={pageNumber} onClick={() => handlePageClick(pageNumber)} className={`bg-[#2d2d2d] rounded-md p-2 text-sm text-white mx-1 w-8 focus:outline-none ${pageNumber === currentPage ? 'bg-blue-500' : ''}`}>{pageNumber}</button>
+                    )
+                ))}
+                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
 
             {selectedCompany && (

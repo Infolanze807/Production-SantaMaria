@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function AddEvent() {
   const [eventTitle, setEventTitle] = useState('');
-  const [eventType, setEventType] = useState('');
+  const [eventType, setEventType] = useState('Event');
   const [eventContent, setEventContent] = useState('');
   const [eventDate, setEventDate] = useState('');
   const [eventImage, setEventImage] = useState(null);
@@ -39,6 +39,8 @@ function AddEvent() {
       formData.append('isFeatured', isFeatured);
   
       console.log(eventType)
+      console.log("FormData:", Object.fromEntries(formData));
+      
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -84,7 +86,7 @@ function AddEvent() {
             <option value="Event">Event</option>
             <option value="News">News</option>
           </select>
-        </div>
+        </div>  
         <div className="mb-5">
           <label htmlFor="eventContent" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Description</label>
           <textarea placeholder='News & Event Description...' id="eventContent" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventContent} onChange={(e) => setEventContent(e.target.value)} required />
