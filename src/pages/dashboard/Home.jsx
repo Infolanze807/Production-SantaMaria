@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react'
 import UserRequest from '../User/UserRequest';
 import AllUser from '../User/AllUser';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 
 function Home() {
@@ -9,6 +10,7 @@ function Home() {
   const [activeTab, setActiveTab] = useState(0);
   const [approvedUsers, setApprovedUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
+  const navigate = useNavigate();
 
   const handleTabClick = (index) => {
     setActiveTab(index);
@@ -21,7 +23,8 @@ function Home() {
     try {
         const token = localStorage.getItem('token');
         if (!token) {
-            throw new Error('No token found. Please login again.');
+          navigate("/sign-in");
+          throw new Error('No token found. Please login again.');
         }
 
         const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/user`, {
@@ -38,15 +41,15 @@ function Home() {
         
     } catch (error) {
         console.error('Error fetching company data:', error);
-          // Check if error response is due to JWT expiration
           if (error.response && error.response.data && error.response.data.code === 500) {
-            // If token has expired, redirect to the login page
             window.alert(error.response.data.message)
-            window.location.href = '/login';
-        } else {
+            // console.log("msg", error.response.data.message);
+            navigate("/sign-in")
+        } 
+        // else {
             // Optionally, set error message in state to display in the UI
             // setError('Error fetching user data. Please try again.');
-        }
+        // }
 
         //setError('Error fetching company data. Please try again.');
     }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
+import { useNavigate } from 'react-router-dom';
 
 function GetComponent() {
   const [componentData, setComponentData] = useState([]);
@@ -18,16 +19,18 @@ function GetComponent() {
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
   const [loadingUpdate, setLoadingUpdate] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   // const [token, setToken] = useState('');
 
   const fetchComponentData = async () => {
+  
     try {
       setLoading(true);
       const storedToken = localStorage.getItem('token');
       if (!storedToken) {
         throw new Error('No token found. Please login again.');
       }
-
+  
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/component`, {
         headers: {
           Authorization: `Bearer ${storedToken}`
@@ -37,11 +40,17 @@ function GetComponent() {
       // setToken(storedToken);
     } catch (error) {
       console.error('Error fetching component data:', error);
-      window.alert('Error fetching component data. Please try again.');
-      setError('Error fetching component data. Please try again.');
+      setLoading(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert('Error fetching component data. Please try again.');
+        setError('Error fetching component data. Please try again.');
+      }
     } finally {
-      setLoading(false); // Set loading back to false after fetching data
-  }
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -63,44 +72,49 @@ function GetComponent() {
     setSelectedComponent(null);
   };
 
+
   const handleDeleteClick = async (componentId) => {
     if (window.confirm("Are you sure you want to delete?")) {
-        try {
-          setDeleteLoadingId(componentId);
-          const token = localStorage.getItem('token');
-          if (!token) {
-              throw new Error('No token found. Please login again.');
-          }
-
-      const base64EncodedIdObject = btoa(JSON.stringify({
-        "iv": componentId.iv,
-        "encryptedData": componentId.encryptedData
-      }));
-
-      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/component/${base64EncodedIdObject}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      try {
+        setDeleteLoadingId(componentId);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found. Please login again.');
         }
-      });
-      if (response.status === 200) {
-        fetchComponentData()
-        // window.alert("Component deleted successfully.");
-        toast.success('Component deleted successfully.');
-    } 
-  } catch (error) {
-    console.error('Error deleting Component:', error);
-    console.error('Error response from server:', error.response?.data); // Log the response data directly
-    window.alert('Error deleting Component. Please try again.');
-  }  finally {
-    setDeleteLoadingId(null); // Set loading state to false after API call completes
-} 
-  // console.log("Item deleted");  // This would be replaced with actual deletion logic
-} else {
-  // If the user clicks "No", simply close the dialog
-  console.log("Deletion cancelled");  // This line is optional, for debugging
-}
-
+  
+        const base64EncodedIdObject = btoa(JSON.stringify({
+          "iv": componentId.iv,
+          "encryptedData": componentId.encryptedData
+        }));
+  
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/component/${base64EncodedIdObject}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+  
+        if (response.status === 200) {
+          fetchComponentData();
+          toast.success('Component deleted successfully.');
+        }
+      } catch (error) {
+        console.error('Error deleting Component:', error);
+        console.error('Error response from server:', error.response?.data);
+        setDeleteLoadingId(null);
+        if (error.response && error.response.status === 500) {
+          window.alert('Token is expired, Please sign in again');
+          navigate('/sign-in');
+        } else {
+          window.alert('Error deleting Component. Please try again.');
+        }
+      } finally {
+        setDeleteLoadingId(null);
+      }
+    } else {
+      console.log("Deletion cancelled");
+    }
   };
+  
 
   const handleChange = (e) => {
     if (e.target.name === 'profile_image' || e.target.name === 'cover_image' || e.target.name === 'icon') {
@@ -116,36 +130,41 @@ function GetComponent() {
       setLoadingUpdate(true);
       const token = localStorage.getItem('token');
       if (!token) {
-          throw new Error('No token found. Please login again.');
+        throw new Error('No token found. Please login again.');
       }
-
+  
       const base64EncodedIdObject = btoa(JSON.stringify({
         "iv": selectedComponent.id.iv,
         "encryptedData": selectedComponent.id.encryptedData
       }));
-
+  
       const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/component/${base64EncodedIdObject}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-       Authorization: `Bearer ${token}`
-   }
+          Authorization: `Bearer ${token}`
+        }
       });
-
+  
       if (response.status === 200) {
-        // window.alert("User Updated Successfully");
         toast.success('Component Updated Successfully');
-        fetchComponentData()  
-        handleCloseClick()
-     } setSelectedComponent(null); // Close the modal after updating
-
-
+        fetchComponentData();
+        handleCloseClick();
+      }
+      setSelectedComponent(null);
+  
     } catch (error) {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
-      window.alert("Error updating component")
+      setLoadingUpdate(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert("Error updating component");
+      }
     } finally {
       setLoadingUpdate(false);
-  }
+    }
   };
 
   const replaceLocalhost = (url) => {
