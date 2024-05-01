@@ -6,7 +6,6 @@ import Loader from '../Loader';
 import { useNavigate } from 'react-router-dom';
 
 function GetComponent() {
-  const [apiResponse, setApiResponse] = useState(null);
   const [componentData, setComponentData] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState(null);
   const [formData, setFormData] = useState({
@@ -24,21 +23,19 @@ function GetComponent() {
   // const [token, setToken] = useState('');
 
   const fetchComponentData = async () => {
+  
     try {
       setLoading(true);
       const storedToken = localStorage.getItem('token');
       if (!storedToken) {
         throw new Error('No token found. Please login again.');
       }
-
+  
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/component`, {
         headers: {
           Authorization: `Bearer ${storedToken}`
         }
       });
-  
-      console.log(response.data.data,"apidetails")
-      setApiResponse(response.data.data);
       setComponentData(response.data.data.data);
       // setToken(storedToken);
     } catch (error) {
@@ -52,12 +49,12 @@ function GetComponent() {
         setError('Error fetching component data. Please try again.');
       }
     } finally {
-      setLoading(false); // Set loading back to false after fetching data
-  }
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    fetchComponentData(URL);
+    fetchComponentData();
   }, []);
 
   const handleViewClick = (component) => {
@@ -78,41 +75,44 @@ function GetComponent() {
 
   const handleDeleteClick = async (componentId) => {
     if (window.confirm("Are you sure you want to delete?")) {
-        try {
-          setDeleteLoadingId(componentId);
-          const token = localStorage.getItem('token');
-          if (!token) {
-              throw new Error('No token found. Please login again.');
-          }
-
-      const base64EncodedIdObject = btoa(JSON.stringify({
-        "iv": componentId.iv,
-        "encryptedData": componentId.encryptedData
-      }));
-
-      const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/component/${base64EncodedIdObject}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
+      try {
+        setDeleteLoadingId(componentId);
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found. Please login again.');
         }
-      });
-      if (response.status === 200) {
-        fetchComponentData()
-        // window.alert("Component deleted successfully.");
-        toast.success('Component deleted successfully.');
-    } 
-  } catch (error) {
-    console.error('Error deleting Component:', error);
-    console.error('Error response from server:', error.response?.data); // Log the response data directly
-    window.alert('Error deleting Component. Please try again.');
-  }  finally {
-    setDeleteLoadingId(null); // Set loading state to false after API call completes
-} 
-  // console.log("Item deleted");  // This would be replaced with actual deletion logic
-} else {
-  // If the user clicks "No", simply close the dialog
-  console.log("Deletion cancelled");  // This line is optional, for debugging
-}
-
+  
+        const base64EncodedIdObject = btoa(JSON.stringify({
+          "iv": componentId.iv,
+          "encryptedData": componentId.encryptedData
+        }));
+  
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/component/${base64EncodedIdObject}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+  
+        if (response.status === 200) {
+          fetchComponentData();
+          toast.success('Component deleted successfully.');
+        }
+      } catch (error) {
+        console.error('Error deleting Component:', error);
+        console.error('Error response from server:', error.response?.data);
+        setDeleteLoadingId(null);
+        if (error.response && error.response.status === 500) {
+          window.alert('Token is expired, Please sign in again');
+          navigate('/sign-in');
+        } else {
+          window.alert('Error deleting Component. Please try again.');
+        }
+      } finally {
+        setDeleteLoadingId(null);
+      }
+    } else {
+      console.log("Deletion cancelled");
+    }
   };
   
 
@@ -147,11 +147,11 @@ function GetComponent() {
   
       if (response.status === 200) {
         toast.success('Component Updated Successfully');
-        fetchComponentData()  
-        handleCloseClick()
-     } setSelectedComponent(null); // Close the modal after updating
-
-
+        fetchComponentData();
+        handleCloseClick();
+      }
+      setSelectedComponent(null);
+  
     } catch (error) {
       console.error('Error updating component:', error);
       console.error('Error response from server:', error.response?.data);
@@ -167,7 +167,9 @@ function GetComponent() {
     }
   };
 
-  
+  const replaceLocalhost = (url) => {
+    return url.replace("http://localhost:5000", "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000");
+};
 
   return (
     <div className='pb-7'>
@@ -195,10 +197,6 @@ function GetComponent() {
           </div>
         ))}
       </div>
-      <div className='text-center pt-4'>
-                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
-                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
-            </div>
       {selectedComponent && (
         <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
