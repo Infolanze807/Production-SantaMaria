@@ -55,7 +55,7 @@ function AllEvent() {
   };
 
   const replaceLocalhost = (url) => {
-    return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
+    return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
 };
 
 const replacePagehost = (url) => {
