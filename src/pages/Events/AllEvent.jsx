@@ -198,9 +198,9 @@ const handlePrevious = () => {
         ))}
       </div>
       <div className='text-center pt-4'>
-              <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Previous</button>
-              <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Next</button>
-              </div>
+          <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+          <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
+      </div>
       {selectedEvent && (
         <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">

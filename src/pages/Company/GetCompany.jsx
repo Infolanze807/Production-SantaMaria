@@ -19,11 +19,12 @@ function GetCompany() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
+    // const [apiURL, setApiURL] = useState('');
 
     
-  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=1`
+  const URL = `${process.env.REACT_APP_API_URL}/api/admin/company?limit=5&page=2`
 
-    const fetchCompanyData = async () => {
+    const fetchCompanyData = async (URL) => {
         try {
             setLoading(true);
             const token = localStorage.getItem('token');
@@ -31,12 +32,12 @@ function GetCompany() {
                 throw new Error('No token found. Please login again.');
             }
 
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/company`, {
+            const response = await axios.get(URL, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
-            console.log(response.data.data,"apidetails")
+            console.log(response.data.data,"apidetailsssssssssss")
             setApiResponse(response.data.data);
             setCompanyData(response.data.data.data);
             
@@ -49,27 +50,28 @@ function GetCompany() {
         }
     };
 
-    const replacePagehost = (url) => {
-        return url.replace(`${process.env.REACT_APP_API_URL}/api/admin/company`, `${process.env.REACT_APP_API_URL}/api/admin/company`);
-      };
+    const replaceLocalhost = (url) => {
+        return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
+    };
 
-    const handleNext = () => {
+    // const NEW_URL = `${process.env.REACT_APP_API_URL}/api/admin/company`
+
+    const handleNext = async() => {
         if (apiResponse && apiResponse.next) {
-         const nexturl = replacePagehost(apiResponse.next)
+         const nexturl = await replaceLocalhost(apiResponse.next)
          console.log(nexturl,"next")
          fetchCompanyData(nexturl);
        }
    };
-
-   const handlePrevious = () => {
+   console.log(apiResponse,"checks")
+   const handlePrevious = async() => {
     if (apiResponse && apiResponse.previous) {
-        const previousurl = replacePagehost(apiResponse.previous);
+        const previousurl = await replaceLocalhost(apiResponse.previous);
         console.log(previousurl, "previous");
         fetchCompanyData(previousurl);
     }
 };
 
-  
     useEffect(() => {
         fetchCompanyData(URL);
     }, []);
@@ -188,9 +190,7 @@ function GetCompany() {
         }
     };
 
-    const replaceLocalhost = (url) => {
-        return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
-    };
+ 
 
     return (
         <div>
@@ -219,9 +219,10 @@ function GetCompany() {
                 </div>
             ))}
             <div className='text-center pt-4'>
-              <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Previous</button>
-              <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className='bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24'>Next</button>
+                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
+
             {selectedCompany && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
@@ -263,6 +264,7 @@ function GetCompany() {
                     </div>
                 </div>
             )}
+             {error && <div className="text-red-600">{error}</div>}
         </div>
     );
 }

@@ -76,7 +76,7 @@ function GetEmergency() {
                 "encryptedData": emergencyId.encryptedData
             }));
             
-            const response = await axios.delete(`${process.env.REACT_APP_API_URL}admin/contact/${base64EncodedIdObject}`, {
+            const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/contact/${base64EncodedIdObject}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -156,7 +156,7 @@ const handleChange = (e) => {
     };
 
     const replaceLocalhost = (url) => {
-        return url.replace("http://localhost:5000", "${process.env.REACT_APP_API_URL}");
+        return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
     };
 
     return (
