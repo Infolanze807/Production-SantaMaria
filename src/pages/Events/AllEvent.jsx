@@ -98,8 +98,6 @@ const handlePrevious = () => {
   };
 
   const handleDeleteClick = async (eventId) => {
-    const navigate = useNavigate(); // Use the useNavigate hook
-  
     if (window.confirm("Are you sure you want to delete?")) {
       try {
         setDeleteLoadingId(eventId);
