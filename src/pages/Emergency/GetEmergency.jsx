@@ -6,6 +6,7 @@ import Loader from '../Loader';
 import { useNavigate } from 'react-router-dom';
 
 function GetEmergency() {
+    const [apiResponse, setApiResponse] = useState(null);
     const [emergencyData, setEmergencyData] = useState([]);
     const [selectedEmergency, setSelectedEmergency] = useState(null);
     const [formData, setFormData] = useState({
@@ -20,7 +21,9 @@ function GetEmergency() {
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
 
-    const fetchEmergencyData = async () => {
+    const URL = `${process.env.REACT_APP_API_URL}/api/admin/contact?limit=5&page=1`
+
+    const fetchEmergencyData = async (URL) => {
         try {
           setLoading(true);
           const token = localStorage.getItem('token');
@@ -28,12 +31,13 @@ function GetEmergency() {
             throw new Error('No token found. Please login again.');
           }
       
-          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/contact`, {
+          const response = await axios.get(URL, {
             headers: {
               Authorization: `Bearer ${token}`
             }
           });
-      
+          console.log(response.data.data,"apidetails")
+          setApiResponse(response.data.data);
           setEmergencyData(response.data.data.data);
       
         } catch (error) {
@@ -51,8 +55,28 @@ function GetEmergency() {
         }
       };
 
+      const replaceLocalhost = (url) => {
+        return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
+    };
+
+    const handleNext = async() => {
+      if (apiResponse && apiResponse.next) {
+       const nexturl = await replaceLocalhost(apiResponse.next)
+       console.log(nexturl,"next")
+       fetchEmergencyData(nexturl);
+     }
+ };
+ console.log(apiResponse,"checks")
+ const handlePrevious = async() => {
+  if (apiResponse && apiResponse.previous) {
+      const previousurl = await replaceLocalhost(apiResponse.previous);
+      console.log(previousurl, "previous");
+      fetchEmergencyData(previousurl);
+  }
+};
+
     useEffect(() => {
-        fetchEmergencyData();
+        fetchEmergencyData(URL);
     }, []);
 
     const handleViewClick = (emergency) => {
@@ -90,7 +114,7 @@ function GetEmergency() {
             });
       
             if (response.status === 200) {
-              fetchEmergencyData();
+              fetchEmergencyData(URL);
               toast.success('Contact deleted successfully.');
             }
       
@@ -148,7 +172,7 @@ const handleSubmit = async (e) => {
       });
       if (response.status === 200) {
         toast.success('Emergency Contact Updated Successfully');
-        fetchEmergencyData();
+        fetchEmergencyData(URL);
         handleCloseClick();
       }
       setSelectedEmergency(null);
@@ -167,9 +191,7 @@ const handleSubmit = async (e) => {
     }
   };
 
-    const replaceLocalhost = (url) => {
-        return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);
-    };
+    
 
     return (
         <div className='pb-7'>
@@ -195,6 +217,10 @@ const handleSubmit = async (e) => {
                     </div>
                 </div>
                 ))}
+            </div>
+            <div className='text-center py-4'>
+                <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
+                <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next} className={`bg-[#2d2d2d] px-5 p-2 text-sm rounded-full text-white mx-2 w-24 ${!apiResponse || !apiResponse.next ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
             {selectedEmergency && (
                 <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
