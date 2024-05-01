@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
+import { useNavigate } from 'react-router-dom';
 
 function GetEmergency() {
     const [emergencyData, setEmergencyData] = useState([]);
@@ -17,30 +18,38 @@ function GetEmergency() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const fetchEmergencyData = async () => {
         try {
-            setLoading(true);
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found. Please login again.');
+          setLoading(true);
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('No token found. Please login again.');
+          }
+      
+          const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/contact`, {
+            headers: {
+              Authorization: `Bearer ${token}`
             }
-
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/contact`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setEmergencyData(response.data.data.data);
-            
+          });
+      
+          setEmergencyData(response.data.data.data);
+      
         } catch (error) {
-            console.error('Error fetching emergency data:', error);
+          console.error('Error fetching emergency data:', error);
+          setLoading(false);
+          if (error.response && error.response.status === 500) {
+            window.alert('Token is expired, Please sign in again');
+            navigate('/sign-in');
+          } else {
             window.alert('Error fetching emergency data. Please try again.');
             setError('Error fetching emergency data. Please try again.');
+          }
         } finally {
-            setLoading(false); // Set loading back to false after fetching data
+          setLoading(false);
         }
-    };
+      };
 
     useEffect(() => {
         fetchEmergencyData();
@@ -62,45 +71,46 @@ function GetEmergency() {
 
     const handleDeleteClick = async (emergencyId) => {
         if (window.confirm("Are you sure you want to delete?")) {
-            
-        try {
+          try {
             setDeleteLoadingId(emergencyId);
             const token = localStorage.getItem('token');
             if (!token) {
-                throw new Error('No token found. Please login again.');
+              throw new Error('No token found. Please login again.');
             }
-            
-
+      
             const base64EncodedIdObject = btoa(JSON.stringify({
-                "iv": emergencyId.iv,
-                "encryptedData": emergencyId.encryptedData
+              "iv": emergencyId.iv,
+              "encryptedData": emergencyId.encryptedData
             }));
-            
+      
             const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/contact/${base64EncodedIdObject}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             });
-
+      
             if (response.status === 200) {
-                fetchEmergencyData()
-                // window.alert("Contact deleted successfully.");
-                toast.success('Contact deleted successfully.');
-            } 
-
-        } catch (error) {
+              fetchEmergencyData();
+              toast.success('Contact deleted successfully.');
+            }
+      
+          } catch (error) {
             console.error('Error deleting Contact:', error);
-            console.error('Error response from server:', error.response?.data); // Log the response data directly
-            window.alert('Error deleting Contact. Please try again.');
-        }   finally {
-            setDeleteLoadingId(null); // Set loading state to false after API call completes
-        } 
-        //   console.log("Item deleted");  // This would be replaced with actual deletion logic
+            console.error('Error response from server:', error.response?.data);
+            setDeleteLoadingId(null);
+            if (error.response && error.response.status === 500) {
+              window.alert('Token is expired, Please sign in again');
+              navigate('/sign-in');
+            } else {
+              window.alert('Error deleting Contact. Please try again.');
+            }
+          } finally {
+            setDeleteLoadingId(null);
+          }
         } else {
-          // If the user clicks "No", simply close the dialog
-          console.log("Deletion cancelled");  // This line is optional, for debugging
-        } 
-};
+          console.log("Deletion cancelled");
+        }
+      };
 
 const handleChange = (e) => {
     const { name, value } = e.target;
@@ -117,43 +127,45 @@ const handleChange = (e) => {
     }
 };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            setLoadingUpdate(true);
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found. Please login again.');
-            }
-
-            const base64EncodedIdObject = btoa(JSON.stringify({
-                "iv": selectedEmergency.id.iv,
-                "encryptedData": selectedEmergency.id.encryptedData
-            }));
-            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/contact/${base64EncodedIdObject}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                 Authorization: `Bearer ${token}`
-             }
-            });
-
-            // After updating, fetch updated emergency data
-            if (response.status === 200) {
-                // window.alert("User Updated Successfully");
-                // console.log("User Updated Successfully")
-                toast.success('Emergency Contact Updated Successfully');
-                fetchEmergencyData()    
-                handleCloseClick()
-             } setSelectedEmergency(null); // Close the modal after updating
-
-            } catch (error) {
-                console.error('Error updating Contact:', error);
-                console.error('Error response from server:', error.response?.data); // Log the response data directly
-                window.alert("Error updating Contact")
-            } finally {
-                setLoadingUpdate(false);
-            }
-    };
+const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoadingUpdate(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found. Please login again.');
+      }
+  
+      const base64EncodedIdObject = btoa(JSON.stringify({
+        "iv": selectedEmergency.id.iv,
+        "encryptedData": selectedEmergency.id.encryptedData
+      }));
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/contact/${base64EncodedIdObject}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (response.status === 200) {
+        toast.success('Emergency Contact Updated Successfully');
+        fetchEmergencyData();
+        handleCloseClick();
+      }
+      setSelectedEmergency(null);
+    } catch (error) {
+      console.error('Error updating Contact:', error);
+      console.error('Error response from server:', error.response?.data);
+      setLoadingUpdate(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert("Error updating Contact");
+      }
+    } finally {
+      setLoadingUpdate(false);
+    }
+  };
 
     const replaceLocalhost = (url) => {
         return url.replace("http://localhost:5000", `${process.env.REACT_APP_API_URL}`);

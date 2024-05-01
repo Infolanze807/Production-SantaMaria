@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
+import { useNavigate } from 'react-router-dom';
 
 function GetBanner() {
     const [apiResponse, setApiResponse] = useState(null);
@@ -17,34 +18,41 @@ function GetBanner() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const URL = `${process.env.REACT_APP_API_URL}/api/admin/banner?limit=5&page=1`
 
     const fetchBannerData = async (URL) => {
         try {
-            setLoading(true);
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No token found. Please login again.');
+          setLoading(true);
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('No token found. Please login again.');
+          }
+      
+          const response = await axios.get(URL, {
+            headers: {
+              Authorization: `Bearer ${token}`
             }
-
-            const response = await axios.get(URL, {
-                headers: {          
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            console.log(response.data.data,"apidetails")
-            setApiResponse(response.data.data);
-            setBannerData(response.data.data.data);
-            
+          });
+          console.log(response.data.data, "apidetails")
+          setApiResponse(response.data.data);
+          setBannerData(response.data.data.data);
+      
         } catch (error) {
-            console.error('Error fetching banner data:', error);
+          console.error('Error fetching banner data:', error);
+          setLoading(false);
+          if (error.response && error.response.status === 500) {
+            window.alert('Token is expired, Please sign in again');
+            navigate('/sign-in');
+          } else {
             window.alert('Error fetching banner data. Please try again.');
             setError('Error fetching banner data. Please try again.');
+          }
         } finally {
-            setLoading(false); // Set loading back to false after fetching data
+          setLoading(false);
         }
-    };
+      };
 
     const replaceLocalhost = (url) => {
         return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
@@ -83,44 +91,47 @@ function GetBanner() {
         };
 
         const handleDeleteClick = async (bannerId) => {
-
             if (window.confirm("Are you sure you want to delete?")) {
-                try {
-                    setDeleteLoadingId(bannerId);
-                    const token = localStorage.getItem('token');
-                    if (!token) {
-                        throw new Error('No token found. Please login again.');
-                    }
-                    
-            const base64EncodedIdObject = btoa(JSON.stringify({
-                "iv": bannerId.iv,
-                "encryptedData": bannerId.encryptedData
-            }));
-            
-            const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/banner/${base64EncodedIdObject}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+              try {
+                setDeleteLoadingId(bannerId);
+                const token = localStorage.getItem('token');
+                if (!token) {
+                  throw new Error('No token found. Please login again.');
                 }
-            });
-            if (response.status === 200) {
-                fetchBannerData(URL)
-                // window.alert("Banner deleted successfully.");
-                toast.success('Banner deleted successfully.');
+          
+                const base64EncodedIdObject = btoa(JSON.stringify({
+                  "iv": bannerId.iv,
+                  "encryptedData": bannerId.encryptedData
+                }));
+          
+                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/banner/${base64EncodedIdObject}`, {
+                  headers: {
+                    Authorization: `Bearer ${token}`
+                  }
+                });
+          
+                if (response.status === 200) {
+                  fetchBannerData(URL);
+                  toast.success('Banner deleted successfully.');
+                }
+          
+              } catch (error) {
+                console.error('Error deleting Banner:', error);
+                console.error('Error response from server:', error.response?.data);
+                setDeleteLoadingId(null);
+                if (error.response && error.response.status === 500) {
+                  window.alert('Token is expired, Please sign in again');
+                  navigate('/sign-in');
+                } else {
+                  window.alert('Error deleting Banner. Please try again.');
+                }
+              } finally {
+                setDeleteLoadingId(null);
+              }
+            } else {
+              console.log("Deletion cancelled");
             }
-    
-        } catch (error) {
-            console.error('Error deleting Banner:', error);
-            console.error('Error response from server:', error.response?.data); // Log the response data directly
-            window.alert('Error deleting Banner. Please try again.');
-        } finally {
-            setDeleteLoadingId(null); // Set loading state to false after API call completes
-        } 
-        } else {
-          // If the user clicks "No", simply close the dialog
-          console.log("Deletion cancelled");  // This line is optional, for debugging
-        }
-  
-};
+          };
 
 
     
@@ -134,43 +145,48 @@ const handleChange = (e) => {
     }
 };
 
-    const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        setLoadingUpdate(true)
-        const token = localStorage.getItem('token');
-        if (!token) {
-            throw new Error('No token found. Please login again.');
+      setLoadingUpdate(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No token found. Please login again.');
+      }
+  
+      const base64EncodedIdObject = btoa(JSON.stringify({
+        "iv": selectedBanner.id.iv,
+        "encryptedData": selectedBanner.id.encryptedData
+      }));
+  
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/banner/${base64EncodedIdObject}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`
         }
-
-        const base64EncodedIdObject = btoa(JSON.stringify({
-            "iv": selectedBanner.id.iv,
-            "encryptedData": selectedBanner.id.encryptedData
-        }));
-
-        const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/banner/${base64EncodedIdObject}`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${token}`
-            }
-        });
-
-        
-        if (response.status === 200) {
-            // window.alert("Banner Updated Successfully");
-            toast.success('Banner Updated Successfully');
-            fetchBannerData(URL)  
-            handleCloseClick()
-         } setSelectedBanner(null); // Close the modal after updating
-
+      });
+  
+      if (response.status === 200) {
+        toast.success('Banner Updated Successfully');
+        fetchBannerData(URL);
+        handleCloseClick();
+      }
+      setSelectedBanner(null);
+  
     } catch (error) {
-        console.error('Error updating banner:', error);
-        console.error('Error response from server:', error.response?.data); // Log the response data directly
-        window.alert("Error updating banner")
+      console.error('Error updating banner:', error);
+      console.error('Error response from server:', error.response?.data);
+      setLoadingUpdate(false);
+      if (error.response && error.response.status === 500) {
+        window.alert('Token is expired, Please sign in again');
+        navigate('/sign-in');
+      } else {
+        window.alert("Error updating banner");
+      }
     } finally {
-        setLoadingUpdate(false);
+      setLoadingUpdate(false);
     }
-    };
+  };
 
 
 

@@ -34,42 +34,52 @@ function AddEmergency() {
         }
       };
 
-    const handleSubmit = async (e) => {
+      const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            setLoading(true);
-            const formDataToSend = new FormData();
-            formDataToSend.append('name', formData.name);
-            formDataToSend.append('contact_no', formData.contact_no);
-            formDataToSend.append('profile_image', formData.profile_image);
-            formDataToSend.append('cover_image', formData.cover_image);
-
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/contact`, formDataToSend, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}`
-                  }
-            });
-
-            if (response.status === 201) {
+          setLoading(true);
+          const formDataToSend = new FormData();
+          formDataToSend.append('name', formData.name);
+          formDataToSend.append('contact_no', formData.contact_no);
+          formDataToSend.append('profile_image', formData.profile_image);
+          formDataToSend.append('cover_image', formData.cover_image);
+      
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('No token found. Please login again.');
+          }
+      
+          const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/contact`, formDataToSend, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: `Bearer ${token}`
+            }
+          });
+      
+          if (response.status === 201) {
             setFormData({
-                name: '',
-                contact_no: '',
-                profile_image: null,
-                cover_image: null
+              name: '',
+              contact_no: '',
+              profile_image: null,
+              cover_image: null
             });
-            // window.alert('Emergency contact added successfully!');
             toast.success('Emergency contact added successfully.');
+          }
+          console.log(response.data);
+        } catch (error) {
+          console.error('Error adding Contact:', error);
+          setLoading(false);
+          if (error.response && error.response.status === 500) {
+            window.alert('Token is expired, Please sign in again');
+            navigate('/sign-in');
+          } else {
+            setError('Error adding Contact. Please try again.');
+            window.alert('Error adding Contact. Please try again.');
+          }
+        } finally {
+          setLoading(false);
         }
-        console.log(response.data)
-    } catch (error) {
-        console.error('Error adding Contact:', error) ;
-        setError('Error adding Contact. Please try again.');
-        window.alert('Error adding Contact. Please try again.');
-      } finally {
-        setLoading(false); // Set loading to false after data submission
-      }
-    };
+      };
 
     return (
         <div>
