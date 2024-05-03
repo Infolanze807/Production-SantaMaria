@@ -83,38 +83,9 @@ export function SignIn() {
             />
           </div>
         {error && <div className="text-red-600">{error}</div>}
-          <Checkbox
-            label={
-              <Typography
-                variant="small"
-                color="gray"
-                className="flex items-center justify-start font-medium"
-              >
-                I agree the&nbsp;
-                <a
-                  href="#"
-                  className="font-normal text-black transition-colors hover:text-gray-900 underline"
-                >
-                  Terms and Conditions
-                </a>
-              </Typography>
-            }
-            containerProps={{ className: "-ml-2.5" }}
-          />
           <Button className="mt-6" fullWidth type="submit" disabled={loading}>
             {loading ? "Signing In.." : "Sign In"}
           </Button>
-          {/* <Link to="/dashboard/home" className="mt-6"><Button className="mt-6" fullWidth>
-            Sign In
-          </Button></Link> */}
-
-          <div className="flex items-center justify-between gap-2 mt-6">
-            <Typography variant="small" className="font-medium text-gray-900">
-              <a href="#">
-                Forgot Password
-              </a>
-            </Typography>
-          </div>
         </form>
       </div>
       <div className="w-2/6 h-full hidden lg:block">
