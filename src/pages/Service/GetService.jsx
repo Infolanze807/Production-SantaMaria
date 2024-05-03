@@ -89,7 +89,6 @@ function GetService() {
     setFormData({
       name: service.name,
       supplierId: service.supplier.name,
-      // image: service.image,
       description: service.description,
       supplierbaseurl:supplierIdBase64
   });

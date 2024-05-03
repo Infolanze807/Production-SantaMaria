@@ -61,10 +61,6 @@ function GetBanner() {
     };
     
 
-    const replaceLocalhost = (url) => {
-        return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
-    };
-
     useEffect(() => {
       fetchBannerData(URL);
   }, [currentPage]); 
@@ -205,7 +201,7 @@ const handleSubmit = async (e) => {
                 {bannerData.map(banner => (
                 <div key={banner.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
                     <div className="relative bg-clip-border rounded-xl overflow-hidden bg-gray-900 text-white shadow-gray-900/20 shadow-lg mx-0 mt-0 mb-4 h-64 xl:h-40">
-                    <img src={replaceLocalhost(banner.image)} alt={banner.title} className="h-full w-full object-cover" />
+                    <img src={banner.image} alt={banner.title} className="h-full w-full object-cover" />
                     </div>
                     <div className="p-6 py-0 px-1">
                     <p className="block antialiased tracking-normal font-sans font-semibold text-sm leading-snug text-gray-900 mt-1 mb-2">Title: &nbsp;<span className='font-normal'>{banner.name}</span></p>

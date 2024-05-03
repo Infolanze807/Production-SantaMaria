@@ -50,10 +50,10 @@ export const routes = [
         element: <Company />,
       },
       {
-        icon: <FaShoppingCart {...icon} />,
-        name: "Supplier",
-        path: "/supplier",
-        element: <Supplier />,
+        icon: <MdDiscount {...icon} />,
+        name: "Discount",
+        path: "/discount",
+        element: <Discount />,
       },
       {
         icon: <IoLogoFirebase {...icon} />,
@@ -68,16 +68,16 @@ export const routes = [
         element: <Component />,
       },
       {
-        icon: <MdDiscount {...icon} />,
-        name: "Discount",
-        path: "/discount",
-        element: <Discount />,
-      },
-      {
         icon: <PiFlagBannerFill {...icon} />,
         name: "Banner",
         path: "/banner",
         element: <Banner />,
+      },
+      {
+        icon: <FaShoppingCart {...icon} />,
+        name: "Supplier",
+        path: "/supplier",
+        element: <Supplier />,
       },
       {
         icon: <RiCustomerServiceFill {...icon} />,

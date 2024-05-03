@@ -62,10 +62,6 @@ function GetEmergency() {
     };
     
 
-      const replaceLocalhost = (url) => {
-        return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
-    };
-
     const handleNext = () => {
       if (apiResponse && apiResponse.next) {
           setCurrentPage(prevPage => prevPage + 1);
@@ -91,8 +87,8 @@ function GetEmergency() {
         setFormData({
             name: emergency.name,
             contact_no: emergency.contact_no,
-            profile_image: emergency.profile_image,
-            cover_image: emergency.cover_image
+            // profile_image: emergency.profile_image,
+            // cover_image: emergency.cover_image
         });
     };
 
@@ -208,10 +204,10 @@ const handleSubmit = async (e) => {
                 <div key={emergency.id.emergencyData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
                 <div className='relative'>
                     <div className='pt-11'>
-                        <img className='-z-10 w-full object-cover rounded-lg' src={replaceLocalhost(emergency.cover_image)} alt="" />
+                        <img className='-z-10 w-full object-cover rounded-lg' src={emergency.cover_image} alt="" />
                     </div>
                     <div className='absolute border-2 border-white rounded-full left-1/2 transform -translate-x-1/2 top-0'>
-                        <img className='w-20 h-20 rounded-full object-cover' src={replaceLocalhost(emergency.profile_image)} alt="" />
+                        <img className='w-20 h-20 rounded-full object-cover' src={emergency.profile_image} alt="" />
                     </div>
                 </div>
                     <div className="p-6 py-0 px-1 pt-5">

@@ -62,9 +62,6 @@ function GetComponent() {
     }
   };
   
-  const replaceLocalhost = (url) => {
-    return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
-};
 
 const handleNext = () => {
   if (apiResponse && apiResponse.next) {
@@ -204,16 +201,16 @@ const handlePageClick = (pageNumber) => {
           <div key={component.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
           <div className='relative'>
             <div className='pt-11'>
-                <img className='-z-10 w-full object-cover rounded-lg' src={replaceLocalhost(component.cover_image)} alt="cover" />
+                <img className='-z-10 w-full object-cover rounded-lg' src={component.cover_image} alt="cover" />
             </div>
             <div className='absolute border-2 border-white rounded-full left-1/2 transform -translate-x-1/2 top-0'>
-                <img className='w-20 h-20 rounded-full object-cover' src={replaceLocalhost(component.profile_image)} alt="profile" />
+                <img className='w-20 h-20 rounded-full object-cover' src={component.profile_image} alt="profile" />
             </div>
           </div>
             <div className="p-6 py-0 px-1 pt-5">
               <p className="block antialiased font-sans text-sm text-gray-900 font-semibold">Name: &nbsp;<span className='font-normal'>{component.name}</span></p>
               <div className='text-sm pt-1 text-gray-900 font-semibold'>Description: &nbsp;<span className='font-normal'>{component.description}</span></div>
-          <div className='flex items-center text-sm text-gray-900 font-semibold pt-1'>Icon: &nbsp;<img className='object-cover rounded-full w-8 h-8' src={replaceLocalhost(component.icon)} alt="icon" /></div>
+          <div className='flex items-center text-sm text-gray-900 font-semibold pt-1'>Icon: &nbsp;<img className='object-cover rounded-full w-8 h-8' src={component.icon} alt="icon" /></div>
             </div>
             <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
               <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(component)}>View</button>

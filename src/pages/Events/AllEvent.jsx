@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaRegStar } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";;
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
@@ -91,6 +91,7 @@ const handlePageClick = (pageNumber) => {
       type: event.type,
       content: event.content,
       published_date: event.published_date,
+      isFeatured: event.isFeatured,
     });
   };
 
@@ -202,7 +203,7 @@ const handlePageClick = (pageNumber) => {
               <img src={event.image} alt={event.title} className="h-full w-full object-cover" />
             </div>
             <div className="p-6 py-0 px-1">
-            <div className='flex items-center justify-between'><div className="block antialiased tracking-normal font-sans text-sm font-semibold leading-snug text-blue-gray-900 mt-1">Title: <span className='font-normal'>{event.title}</span></div><FaRegStar /></div>
+            <div className='flex items-center justify-between'><div className="block antialiased tracking-normal font-sans text-sm font-semibold leading-snug text-blue-gray-900 mt-1">Title: <span className='font-normal'>{event.title}</span></div><FaStar className={`${event.isFeatured ? 'text-red-500' : 'text-gray-500'}`} /></div>
               <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Description: <span className='font-normal'>{event.content}</span></p>
               <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Type: <span className='font-normal'>{event.type}</span></p>
             <div className='text-sm font-semibold text-blue-gray-900 '>Date: <span className='font-normal'>{new Date(event.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span></div>
