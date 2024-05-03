@@ -88,9 +88,9 @@ const handlePageClick = (pageNumber) => {
     setFormData({
       name: component.name,
       description: component.description,
-      profile_image: component.profile_image,
-      cover_image: component.cover_image,
-      icon: component.icon
+      // profile_image: component.profile_image,
+      // cover_image: component.cover_image,
+      // icon: component.icon
     });
   };
 
