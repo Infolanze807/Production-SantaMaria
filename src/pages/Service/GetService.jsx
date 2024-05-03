@@ -5,16 +5,16 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
 
-function GetDiscount() {
+function GetService() {
 
     const [apiResponse, setApiResponse] = useState(null);
-    const [discountData, setDiscountData] = useState([]);
+    const [serviceData, setServiceData] = useState([]);
     const [formData, setFormData] = useState({
-        title: '',
-        companyId: '',
+        name: '',
+        supplierId: '',
         image: null,
-        valid_till: '',
-        companybaseurl:''
+        description: '',
+        supplierbaseurl:''
     });
     const [error, setError] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(null);
@@ -24,78 +24,74 @@ function GetDiscount() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
-
     const limitPerPage = 5;
-    
-    const URL = `${process.env.REACT_APP_API_URL}/api/admin/discount?limit=${limitPerPage}&page=${currentPage}`;
+    const URL = `${process.env.REACT_APP_API_URL}/api/admin/service?limit=${limitPerPage}&page=${currentPage}`;
 
-    const fetchDiscountData = async (URL) => {
-      try {
-          setLoading(true);
-          const token = localStorage.getItem('token');
-          if (token) {
-              const response = await axios.get(URL, {
-                  headers: {
-                      Authorization: `Bearer ${token}`
-                  }
-              });
-              setApiResponse(response.data.data);
-              setDiscountData(response.data.data.data);
-              setTotalPages(Math.ceil(response.data.data.total / limitPerPage)); // Calculate total pages
-          } else {
-              navigate('/sign-in');
-          }
-      } catch (error) {
-          console.error('Error fetching discount data:', error);
-          setLoading(false);
-          if (error.response && error.response.status === 500) {
-              window.alert('Token is expired, Please sign in again');
-              navigate('/sign-in');
-          } else {
-              window.alert('Error fetching discount data. Please try again.');
-              setError('Error fetching discount data. Please try again.');
-          }
-      } finally {
-          setLoading(false);
-      }
+
+    const fetchServiceData = async (URL) => {
+        try {
+            setLoading(true);
+            const token = localStorage.getItem('token');
+            if (token) {
+                const response = await axios.get(URL, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setApiResponse(response.data.data);
+                setServiceData(response.data.data.data);
+                setTotalPages(Math.ceil(response.data.data.total / limitPerPage)); // Calculate total pages
+            } else {
+                navigate('/sign-in');
+            }
+        } catch (error) {
+            console.error('Error fetching service data:', error);
+            setLoading(false);
+            if (error.response && error.response.status === 500) {
+                window.alert('Token is expired, Please sign in again');
+                navigate('/sign-in');
+            } else {
+                window.alert('Error fetching service data. Please try again.');
+                setError('Error fetching service data. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+  
+    useEffect(() => {
+      fetchServiceData(URL);
+  }, [currentPage]);
+  
+  const handleNext = () => {
+    if (apiResponse && apiResponse.next) {
+        setCurrentPage(prevPage => prevPage + 1);
+    }
+  };
+  
+  const handlePrevious = () => {
+    if (apiResponse && apiResponse.previous) {
+        setCurrentPage(prevPage => prevPage - 1);
+    }
+  };
+  
+  const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
-  useEffect(() => {
-    fetchDiscountData(URL);
-}, [currentPage]);
-
-const handleNext = () => {
-  if (apiResponse && apiResponse.next) {
-      setCurrentPage(prevPage => prevPage + 1);
-  }
-};
-
-const handlePrevious = () => {
-  if (apiResponse && apiResponse.previous) {
-      setCurrentPage(prevPage => prevPage - 1);
-  }
-};
-
-const handlePageClick = (pageNumber) => {
-  setCurrentPage(pageNumber);
-};
-
-
-
-
-  const handleEditClick = (discount) => {
-    console.log(discount)
-    const companyIdBase64 = btoa(JSON.stringify({
-      "iv": discount.company.id.iv,
-      "encryptedData": discount.company.id.encryptedData,
+  const handleEditClick = (service) => {
+    console.log(service)
+    const supplierIdBase64 = btoa(JSON.stringify({
+      "iv": service.supplier.id.iv,
+      "encryptedData": service.supplier.id.encryptedData,
   }));
-    setIsModalOpen(discount);
+    setIsModalOpen(service);
     setFormData({
-      title: discount.title,
-      companyId: discount.company.name,
-      // image: discount.image,
-      valid_till: discount.valid_till,
-      companybaseurl:companyIdBase64
+      name: service.name,
+      supplierId: service.supplier.name,
+      // image: service.image,
+      description: service.description,
+      supplierbaseurl:supplierIdBase64
   });
   };
 
@@ -117,16 +113,16 @@ const handlePageClick = (pageNumber) => {
         "encryptedData": isModalOpen.id.encryptedData
       }));
       const requestBody = {
-        title: formData.title,
-        companyId:formData.companybaseurl,
+        name: formData.name,
+        supplierId:formData.supplierbaseurl,
         image: formData.image,
-        valid_till: formData.valid_till,
+        description: formData.description,
       };
       if (formData.image) {
         requestBody.image = formData.image;
       }
       
-      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/discount/${base64EncodedIdObject}`,
+      const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/admin/service/${base64EncodedIdObject}`,
         requestBody, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -135,27 +131,26 @@ const handlePageClick = (pageNumber) => {
       });
   
       if (response.status === 200) {
-        toast.success('Discount Updated Successfully');
-        fetchDiscountData(URL);
+        toast.success('Service Updated Successfully');
+        fetchServiceData(URL);
         handleCancelClick();
       }
       setIsModalOpen(null);
   
     } catch (error) {
-      console.error('Error updating discount:', error);
+      console.error('Error updating service:', error);
       console.error('Error response from server:', error.response?.data);
       setLoadingUpdate(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
         navigate('/sign-in');
       } else {
-        window.alert("Error updating discount");
+        window.alert("Error updating service");
       }
     } finally {
       setLoadingUpdate(false);
     }
   };
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -166,41 +161,40 @@ const handlePageClick = (pageNumber) => {
     }
 };
 
-
-  const handleDeleteClick = async (discountId) => {
+const handleDeleteClick = async (serviceId) => {
     if (window.confirm("Are you sure you want to delete?")) {
       try {
-        setDeleteLoadingId(discountId);
+        setDeleteLoadingId(serviceId);
         const token = localStorage.getItem('token');
         if (!token) {
           throw new Error('No token found. Please login again.');
         }
   
         const base64EncodedIdObject = btoa(JSON.stringify({
-          "iv": discountId.iv,
-          "encryptedData": discountId.encryptedData
+          "iv": serviceId.iv,
+          "encryptedData": serviceId.encryptedData
         }));
   
-        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/discount/${base64EncodedIdObject}`, {
+        const response = await axios.delete(`${process.env.REACT_APP_API_URL}/api/admin/service/${base64EncodedIdObject}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
   
         if (response.status === 200) {
-          fetchDiscountData(URL);
-          toast.success('Discount deleted successfully.');
+          fetchServiceData(URL);
+          toast.success('Service deleted successfully.');
         }
   
       } catch (error) {
-        console.error('Error deleting discount:', error);
+        console.error('Error deleting service:', error);
         console.error('Error response from server:', error.response?.data);
         setDeleteLoadingId(null);
         if (error.response && error.response.status === 500) {
           window.alert('Token is expired, Please sign in again');
           navigate('/sign-in');
         } else {
-          window.alert('Error deleting Discount. Please try again.');
+          window.alert('Error deleting service. Please try again.');
         }
       } finally {
         setDeleteLoadingId(null);
@@ -209,27 +203,26 @@ const handlePageClick = (pageNumber) => {
       console.log("Deletion cancelled");
     }
   };
-  
 
 
   return (
     <div>
-      <div className="pb-7">
+        <div className="pb-7">
       {loading ? <Loader /> : 
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
-        {discountData.map(discount => (
-          <div key={discount.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
+        {serviceData.map(service => (
+          <div key={service.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
             <div className="relative bg-clip-border rounded-xl overflow-hidden bg-gray-900 text-white shadow-gray-900/20 shadow-lg mx-0 mt-0 mb-4 h-64 xl:h-40">
-              <img src={discount.image} alt={discount.title} className="h-full w-full object-cover" />
+              <img src={service.image} alt={service.name} className="h-full w-full object-cover" />
             </div>
             <div className="p-6 py-0 px-1">
-              <p className="block antialiased tracking-normal font-sans font-semibold text-sm leading-snug text-gray-900 mt-1 mb-2">Title: &nbsp;<span className='font-normal'>{discount.title}</span></p>
-              <p className="block antialiased font-sans text-sm leading-normal font-semibold text-gray-900">Company Name: &nbsp;<span className='font-normal'>{discount.company.name}</span></p>
-            <div className='text-sm text-gray-900 font-semibold pt-2'>Validity Date: &nbsp;<span className='font-normal'>{new Date(discount.valid_till).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span></div>
+              <p className="block antialiased tracking-normal font-sans font-semibold text-sm leading-snug text-gray-900 mt-1 mb-2">Title: &nbsp;<span className='font-normal'>{service.name}</span></p>
+              <p className="block antialiased font-sans text-sm leading-normal font-semibold text-gray-900">Supplier Name: &nbsp;<span className='font-normal'>{service.supplier.name}</span></p>
+            <div className='text-sm text-gray-900 font-semibold pt-2'>Description: &nbsp;<span className='font-normal'>{service.description}</span></div>
             </div>
             <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
-              <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleEditClick(discount)}>View</button>
-              <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(discount.id)} disabled={deleteLoadingId === discount.id}>{deleteLoadingId === discount.id ? 'Loading...' : 'Delete'}</button>
+              <button className="bg-green-500 px-5 p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleEditClick(service)}>View</button>
+              <button className="bg-red-500 px-5 p-2 text-sm rounded-full text-white" onClick={() => handleDeleteClick(service.id)} disabled={deleteLoadingId === service.id}>{deleteLoadingId === service.id ? 'Loading...' : 'Delete'}</button>
             </div>
           </div>
         ))}
@@ -247,19 +240,19 @@ const handlePageClick = (pageNumber) => {
       {isModalOpen && (
         <div className="fixed inset-0 p-3 flex justify-center items-center bg-black bg-opacity-50 z-50">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
-            <h2 className="text-2xl font-bold mb-4">Update Discount</h2>
+            <h2 className="text-2xl font-bold mb-4">Update Service</h2>
             <form class="max-w-xl mx-auto" onSubmit={handleSubmit}>
         <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Discount Title</label>
-            <input value={formData.title} onChange={handleChange} name='title' type="text" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="lorem ipsum" />
+            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service Title</label>
+            <input value={formData.name} onChange={handleChange} name='name' type="text" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="lorem ipsum" />
         </div>
         <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Company ID</label>
-            <input readonly value={formData.companyId}  name='companyId' placeholder='Lorem ipsum dolor sit...' type="text" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service ID</label>
+            <input readonly value={formData.supplierId}  name='serviceId' placeholder='Lorem ipsum dolor sit...' type="text" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         </div>
         <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Validity Date</label>
-            <input value={formData.valid_till} onChange={handleChange} name='valid_till' placeholder='Date...' type="date" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service Description</label>
+            <textarea value={formData.description} onChange={handleChange} name='description' placeholder='Date...' type="date" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         </div>
         <div className='mb-5'>
         <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">Upload Image</label>
@@ -278,4 +271,4 @@ const handlePageClick = (pageNumber) => {
   )
 }
 
-export default GetDiscount;
+export default GetService;

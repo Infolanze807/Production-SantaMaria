@@ -20,6 +20,8 @@ import { BiSolidComponent } from "react-icons/bi";
 import { MdDiscount } from "react-icons/md";
 import { PiFlagBannerFill } from "react-icons/pi";
 import Home from "./pages/dashboard/Home";
+import Service from "./pages/dashboard/Service";
+import { RiCustomerServiceFill } from "react-icons/ri";
 
 const icon = {
   className: "w-5 h-5 text-inherit",
@@ -41,12 +43,6 @@ export const routes = [
         path: "/events",
         element: <Events />,
       },
-      // {
-      //   icon: <TableCellsIcon {...icon} />,
-      //   name: "News",
-      //   path: "/news",
-      //   element: <News />,
-      // },
       {
         icon: <HiBuildingOffice {...icon} />,
         name: "Company",
@@ -82,6 +78,12 @@ export const routes = [
         name: "Banner",
         path: "/banner",
         element: <Banner />,
+      },
+      {
+        icon: <RiCustomerServiceFill {...icon} />,
+        name: "Service",
+        path: "/service",
+        element: <Service />,
       },
     ],
   },

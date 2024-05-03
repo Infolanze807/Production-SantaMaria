@@ -61,15 +61,8 @@ function AllEvent() {
       setLoading(false); // Set loading back to false after fetching data
     }
   };
-  
 
-  const replaceLocalhost = (url) => {
-    return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
-};
 
-// const replacePagehost = (url) => {
-//   return url.replace("http://localhost:5000/api/admin/news_and_event", `${process.env.REACT_APP_API_URL}/api/admin/newsandevent`);
-// };
 
 const handleNext = () => {
   if (apiResponse && apiResponse.next) {
@@ -98,7 +91,6 @@ const handlePageClick = (pageNumber) => {
       type: event.type,
       content: event.content,
       published_date: event.published_date,
-      image: null, // Assuming you don't want to change the image on update
     });
   };
 
@@ -207,7 +199,7 @@ const handlePageClick = (pageNumber) => {
         {eventData.map(event => (
           <div key={event.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
             <div className="relative bg-clip-border rounded-xl overflow-hidden bg-gray-900 text-white shadow-gray-900/20 shadow-lg mx-0 mt-0 mb-4 h-64 xl:h-40">
-              <img src={replaceLocalhost(event.image)} alt={event.title} className="h-full w-full object-cover" />
+              <img src={event.image} alt={event.title} className="h-full w-full object-cover" />
             </div>
             <div className="p-6 py-0 px-1">
             <div className='flex items-center justify-between'><div className="block antialiased tracking-normal font-sans text-sm font-semibold leading-snug text-blue-gray-900 mt-1">Title: <span className='font-normal'>{event.title}</span></div><FaRegStar /></div>

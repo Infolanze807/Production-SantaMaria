@@ -63,12 +63,6 @@ function GetCompany() {
   };
   
 
-    const replaceLocalhost = (url) => {
-        return url.replace(`${process.env.REACT_APP_LOCAL_HOST}`, `${process.env.REACT_APP_API_URL}`);
-    };
-
-    // const NEW_URL = `${process.env.REACT_APP_API_URL}/api/admin/company`
-
     const handleNext = () => {
       if (apiResponse && apiResponse.next) {
           setCurrentPage(prevPage => prevPage + 1);
@@ -216,10 +210,10 @@ function GetCompany() {
                 <div key={company.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
                     <div className='col-span-2 relative'>
                         <div className='pt-11 lg:w-72'>
-                            <img className='-z-10 w-full object-cover rounded-lg' src={replaceLocalhost(company.cover_image)} alt="" />
+                            <img className='-z-10 w-full object-cover rounded-lg' src={company.cover_image} alt="" />
                         </div>
                         <div className=''>
-                            <img className='absolute border-4 bg-white w-24 h-24 rounded-full object-cover left-6 top-0' src={replaceLocalhost(company.profile_image)} alt="" />
+                            <img className='absolute border-4 bg-white w-24 h-24 rounded-full object-cover left-6 top-0' src={company.profile_image} alt="" />
                         </div>
                     </div>
                     <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>

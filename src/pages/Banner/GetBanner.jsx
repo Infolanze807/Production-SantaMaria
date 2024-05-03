@@ -90,7 +90,7 @@ function GetBanner() {
             setFormData({
                 name: banner.name,
                 description: banner.description,
-                image: banner.image
+                // image: banner.image
             });
         };
 
