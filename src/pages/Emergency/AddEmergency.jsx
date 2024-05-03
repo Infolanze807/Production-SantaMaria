@@ -36,6 +36,11 @@ function AddEmergency() {
 
       const handleSubmit = async (e) => {
         e.preventDefault();
+        const contactNumberPattern = /^[0-9\b]+$/;
+    if (!contactNumberPattern.test(formData.contact_no)) {
+      toast.error('Contact number should contain only digits.');
+      return;
+    }
         try {
           setLoading(true);
           const formDataToSend = new FormData();

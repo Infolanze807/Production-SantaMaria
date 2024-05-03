@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
   Input,
-  Checkbox,
   Button,
   Typography,
 } from "@material-tailwind/react";
 import { useNavigate, Link } from "react-router-dom";
 import { useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
@@ -25,6 +25,14 @@ export function SignIn() {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
+    if (!validateEmail(email)) {
+      toast.error('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters long.');
+      return;
+    }
     try {
       setLoading(true);
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/login`, {
@@ -33,16 +41,21 @@ export function SignIn() {
       });      
       if (response.status === 200) {
         const userData = response.data.data;
-        // localStorage.setItem('user', JSON.stringify(userData));
         localStorage.setItem('token', userData.authToken);
         navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error during login:', error);
-      setError('Invalid email or password.');
+      toast.error('Invalid email or password.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const validateEmail = (email) => {
+    // eslint-disable-next-line no-useless-escape
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   };
 
   return (
@@ -82,7 +95,6 @@ export function SignIn() {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
-        {error && <div className="text-red-600">{error}</div>}
           <Button className="mt-6" fullWidth type="submit" disabled={loading}>
             {loading ? "Signing In.." : "Sign In"}
           </Button>

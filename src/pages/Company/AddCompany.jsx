@@ -29,6 +29,11 @@ function AddCompany() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const contactNumberPattern = /^[0-9\b]+$/;
+    if (!contactNumberPattern.test(contactNumber)) {
+      toast.error('Contact number should contain only digits.');
+      return;
+    }
     try {
       setLoading(true);
       const formData = new FormData();
