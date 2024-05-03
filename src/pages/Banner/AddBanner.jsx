@@ -66,15 +66,15 @@ function AddBanner() {
       <div className='p-4 py-8 mb-7 bg-[--main-color] bg-clip-border rounded-xl'>
         <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
           <div className="mb-5">
-            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+            <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Banner Name</label>
             <input type="text" id="name" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[--second-color] focus:border-[--second-color] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[--second-color] dark:focus:border-[--second-color]" placeholder="Name..." value={name} onChange={(e) => setName(e.target.value)} required />
           </div>
           <div className="mb-5">
-            <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+            <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Banner Description</label>
             <textarea placeholder='Description...' id="description" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[--second-color] focus:border-[--second-color] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[--second-color] dark:focus:border-[--second-color]" value={description} onChange={(e) => setDescription(e.target.value)} required />
           </div>
           <div className='mb-5'>
-            <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
+            <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Banner Image</label>
             <input type="file" id="image" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-[--second-color] focus:border-[--second-color] block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-[--second-color] dark:focus:border-[--second-color]" onChange={(e) => setImage(e.target.files[0])} required />
           </div>
           <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>

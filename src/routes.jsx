@@ -53,12 +53,12 @@ export const routes = [
         path: "/company",
         element: <Company />,
       },
-      // {
-      //   icon: <FaShoppingCart {...icon} />,
-      //   name: "Supplier",
-      //   path: "/supplier",
-      //   element: <Supplier />,
-      // },
+      {
+        icon: <FaShoppingCart {...icon} />,
+        name: "Supplier",
+        path: "/supplier",
+        element: <Supplier />,
+      },
       {
         icon: <IoLogoFirebase {...icon} />,
         name: "Emergency",
