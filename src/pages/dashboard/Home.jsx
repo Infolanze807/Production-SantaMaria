@@ -45,9 +45,9 @@ function Home() {
     } catch (error) {
         console.error('Error fetching company data:', error);
           if (error.response && error.response.data && error.response.data.code === 500) {
-            // window.alert(error.response.data.message)
+            window.alert("Token is expired, Please Sign In again.")
             // console.log("msg", error.response.data.message);
-            navigate("/sign-in")
+            // navigate("/sign-in")
         } 
         // else {
             // Optionally, set error message in state to display in the UI

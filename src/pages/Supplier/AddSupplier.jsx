@@ -68,7 +68,7 @@ function AddSupplier() {
       setLoading(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         setError('Error adding supplier. Please try again.');    
         window.alert('Error adding supplier. Please try again.');

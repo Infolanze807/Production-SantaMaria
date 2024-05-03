@@ -55,7 +55,7 @@ function AllEvent() {
       setLoading(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       }
     } finally {
       setLoading(false); // Set loading back to false after fetching data
@@ -128,7 +128,7 @@ const handlePageClick = (pageNumber) => {
         setDeleteLoadingId(null);
         if (error.response && error.response.status === 500) {
           window.alert('Token is expired, Please sign in again');
-          navigate('/sign-in');
+          // navigate('/sign-in');
         } else {
           window.alert('Error deleting News and Event. Please try again.');
         }
@@ -184,7 +184,7 @@ const handlePageClick = (pageNumber) => {
       setLoadingUpdate(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       }
     } finally {
       setLoadingUpdate(false);

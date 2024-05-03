@@ -50,7 +50,7 @@ function GetDiscount() {
           setLoading(false);
           if (error.response && error.response.status === 500) {
               window.alert('Token is expired, Please sign in again');
-              navigate('/sign-in');
+              // navigate('/sign-in');
           } else {
               window.alert('Error fetching discount data. Please try again.');
               setError('Error fetching discount data. Please try again.');
@@ -147,7 +147,7 @@ const handlePageClick = (pageNumber) => {
       setLoadingUpdate(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert("Error updating discount");
       }
@@ -198,7 +198,7 @@ const handlePageClick = (pageNumber) => {
         setDeleteLoadingId(null);
         if (error.response && error.response.status === 500) {
           window.alert('Token is expired, Please sign in again');
-          navigate('/sign-in');
+          // navigate('/sign-in');
         } else {
           window.alert('Error deleting Discount. Please try again.');
         }

@@ -45,14 +45,14 @@ function GetComponent() {
         setTotalPages(Math.ceil(response.data.data.total / limitPerPage));
       } else {
         navigate('/sign-in');
-        // alert("Token is not valid. Please sign in first.");
+        alert("Token is not valid. Please sign in first.");
       }
     } catch (error) {
       console.error('Error fetching component data:', error);
       setLoading(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert('Error fetching component data. Please try again.');
         setError('Error fetching component data. Please try again.');
@@ -129,7 +129,7 @@ const handlePageClick = (pageNumber) => {
         setDeleteLoadingId(null);
         if (error.response && error.response.status === 500) {
           window.alert('Token is expired, Please sign in again');
-          navigate('/sign-in');
+          // navigate('/sign-in');
         } else {
           window.alert('Error deleting Component. Please try again.');
         }
@@ -184,7 +184,7 @@ const handlePageClick = (pageNumber) => {
       setLoadingUpdate(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert("Error updating component");
       }

@@ -51,7 +51,7 @@ function AddBanner() {
       setLoading(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert('Error adding banner. Please try again.');
       }

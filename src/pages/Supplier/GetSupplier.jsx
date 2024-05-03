@@ -41,14 +41,14 @@ function GetSupplier() {
             console.log("xyz", response.data.data)
           } else {
             navigate('/sign-in');
-            // window.alert('Token is not valid. Please sign in first.');
+            window.alert('Token is not valid. Please sign in first.');
           }
         } catch (error) {
             console.error('Error fetching supplier data:', error);
             setLoading(false);
             if (error.response && error.response.status === 500) {
               window.alert('Token is expired, Please sign in again');
-              navigate('/sign-in');
+              // navigate('/sign-in');
             } else {
               window.alert('Error fetching supplier data. Please try again.');
               setError('Error fetching supplier data. Please try again.');
@@ -122,7 +122,7 @@ function GetSupplier() {
                     setDeleteLoadingId(null);
                     if (error.response && error.response.status === 500) {
                       window.alert('Token is expired, Please sign in again');
-                      navigate('/sign-in');
+                      // navigate('/sign-in');
                     } else {
                       window.alert('Error deleting supplier. Please try again.');
                     }
@@ -185,7 +185,7 @@ function GetSupplier() {
                   setLoadingUpdate(false);
                   if (error.response && error.response.status === 500) {
                     window.alert('Token is expired, Please sign in again');
-                    navigate('/sign-in');
+                    // navigate('/sign-in');
                   }
                 } finally {
                   setLoadingUpdate(false);

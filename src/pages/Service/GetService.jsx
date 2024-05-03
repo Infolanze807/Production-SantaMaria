@@ -42,6 +42,7 @@ function GetService() {
                 setServiceData(response.data.data.data);
                 setTotalPages(Math.ceil(response.data.data.total / limitPerPage)); // Calculate total pages
             } else {
+              window.alert('Token is expired, Please sign in again');
                 navigate('/sign-in');
             }
         } catch (error) {
@@ -49,7 +50,7 @@ function GetService() {
             setLoading(false);
             if (error.response && error.response.status === 500) {
                 window.alert('Token is expired, Please sign in again');
-                navigate('/sign-in');
+                // navigate('/sign-in');
             } else {
                 window.alert('Error fetching service data. Please try again.');
                 setError('Error fetching service data. Please try again.');
@@ -142,7 +143,7 @@ function GetService() {
       setLoadingUpdate(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert("Error updating service");
       }
@@ -191,7 +192,7 @@ const handleDeleteClick = async (serviceId) => {
         setDeleteLoadingId(null);
         if (error.response && error.response.status === 500) {
           window.alert('Token is expired, Please sign in again');
-          navigate('/sign-in');
+          // navigate('/sign-in');
         } else {
           window.alert('Error deleting service. Please try again.');
         }

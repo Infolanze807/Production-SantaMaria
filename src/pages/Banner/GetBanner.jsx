@@ -43,6 +43,7 @@ function GetBanner() {
                 setBannerData(response.data.data.data);
                 setTotalPages(Math.ceil(response.data.data.total / limitPerPage)); // Calculate total pages
             } else {
+              window.alert('Token is expired, Please sign in again');
                 navigate('/sign-in');
             }
         } catch (error) {
@@ -50,7 +51,7 @@ function GetBanner() {
             setLoading(false);
             if (error.response && error.response.status === 500) {
                 window.alert('Token is expired, Please sign in again');
-                navigate('/sign-in');
+                // navigate('/sign-in');
             } else {
                 window.alert('Error fetching banner data. Please try again.');
                 setError('Error fetching banner data. Please try again.');
@@ -125,7 +126,7 @@ function GetBanner() {
                 setDeleteLoadingId(null);
                 if (error.response && error.response.status === 500) {
                   window.alert('Token is expired, Please sign in again');
-                  navigate('/sign-in');
+                  // navigate('/sign-in');
                 } else {
                   window.alert('Error deleting Banner. Please try again.');
                 }
@@ -183,7 +184,7 @@ const handleSubmit = async (e) => {
       setLoadingUpdate(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert("Error updating banner");
       }

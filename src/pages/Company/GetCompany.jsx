@@ -45,14 +45,14 @@ function GetCompany() {
         setTotalPages(Math.ceil(response.data.data.total / limitPerPage));
       } else {
         navigate('/sign-in');
-        // window.alert('Token is not valid. Please sign in first.');
+        window.alert('Token is not valid. Please sign in first.');
       }
     } catch (error) {
       console.error('Error fetching company data:', error);
       setLoading(false);
       if (error.response && error.response.status === 500) {
         window.alert('Token is expired, Please sign in again');
-        navigate('/sign-in');
+        // navigate('/sign-in');
       } else {
         window.alert('Error fetching company data. Please try again.');
         setError('Error fetching company data. Please try again.');
@@ -129,7 +129,7 @@ function GetCompany() {
             setDeleteLoadingId(null);
             if (error.response && error.response.status === 500) {
               window.alert('Token is expired, Please sign in again');
-              navigate('/sign-in');
+              // navigate('/sign-in');
             } else {
               window.alert('Error deleting company. Please try again.');
             }
@@ -193,7 +193,7 @@ function GetCompany() {
           setLoadingUpdate(false);
           if (error.response && error.response.status === 500) {
             window.alert('Token is expired, Please sign in again');
-            navigate('/sign-in');
+            // navigate('/sign-in');
           }
         } finally {
           setLoadingUpdate(false);

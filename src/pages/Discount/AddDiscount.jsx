@@ -46,6 +46,7 @@ function AddDiscount() {
                 setCompanies(modifiedCompaniesData);
                 console.log("Companies:", modifiedCompaniesData);
             } else {
+                window.alert('Token is not valid. Please sign in first.');
                 navigate('/sign-in');
             }
         } catch (error) {
