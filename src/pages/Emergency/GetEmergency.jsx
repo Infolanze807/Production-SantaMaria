@@ -258,9 +258,11 @@ const handleSubmit = async (e) => {
                                 <label htmlFor="cover_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cover Image</label>
                                 <input onChange={handleChange} type="file" id="cover_image" name="cover_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
-                            <button type="submit" className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
+                            <div className='flex items-center justify-end space-x-4'>
+                            <button onClick={handleCloseClick} className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-200">Cancel</button>
+                            <button typce="submit" className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600 transition duration-200" disabled={loadingUpdate}>{loadingUpdate ? 'Updating...' : 'Update'}</button>
+                            </div>
                         </form>
-                        <button onClick={handleCloseClick} className="bg-gray-200 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-300 transition duration-200 mt-4">Cancel</button>
                     </div>
                 </div>
             )}
