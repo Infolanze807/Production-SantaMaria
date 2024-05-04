@@ -22,7 +22,7 @@ function GetBanner() {
     const [totalPages, setTotalPages] = useState(1); 
     const navigate = useNavigate();
 
-    const limitPerPage = 5;
+    const limitPerPage = 4;
 
 
     // const URL = `${process.env.REACT_APP_API_URL}/api/admin/banner?limit=5&page=1`

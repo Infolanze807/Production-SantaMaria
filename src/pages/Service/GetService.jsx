@@ -24,7 +24,7 @@ function GetService() {
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
     const [loadingUpdate, setLoadingUpdate] = useState(false);
     const [loading, setLoading] = useState(false);
-    const limitPerPage = 5;
+    const limitPerPage = 4;
     const URL = `${process.env.REACT_APP_API_URL}/api/admin/service?limit=${limitPerPage}&page=${currentPage}`;
 
 
