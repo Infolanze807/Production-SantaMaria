@@ -1,76 +1,13 @@
 import React, {useEffect, useState} from 'react'
 import UserRequest from '../User/UserRequest';
 import AllUser from '../User/AllUser';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import Loader from '../Loader';
-
 
 function Home() {
-  const [users, setUsers] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
-  const [approvedUsers, setApprovedUsers] = useState([]);
-  const [pendingUsers, setPendingUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleTabClick = (index) => {
     setActiveTab(index);
   };
-  const handleDataChange = () => {
-    fetchUserData()  
-};
-  const fetchUserData = async () => {
-  
-    try {
-        setLoading(true);
-        const token = localStorage.getItem('token');
-        if (!token) {
-          navigate("/sign-in");
-          throw new Error('No token found. Please login again.');
-        }
-
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/admin/user`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        });
-        if (response.status === 200) {
-          // Set users and filter users from response data
-          setUsers(response.data.data.data);
-          filterUsers(response.data.data.data);
-          // console.log(response.data.data.data);
-      } 
-        
-    } catch (error) {
-        console.error('Error fetching company data:', error);
-          if (error.response && error.response.data && error.response.data.code === 500) {
-            window.alert("Token is expired, Please Sign In again.")
-            // console.log("msg", error.response.data.message);
-            // navigate("/sign-in")
-        } 
-        // else {
-            // Optionally, set error message in state to display in the UI
-            // setError('Error fetching user data. Please try again.');
-        // }
-
-        //setError('Error fetching company data. Please try again.');
-    } finally {
-        setLoading(false);
-    }
-};
-
-const filterUsers = (users) => {
-  const approved = users.filter(user => user.isApproved === true);
-  const pending = users.filter(user => user.isApproved === false);
-  setApprovedUsers(approved);
-  setPendingUsers(pending);
-console.log(approved,"approved")
-console.log(pending,"pending")
-};
-    useEffect(() => {
-      fetchUserData();
-    }, []);
 
   return (
     <div className="">
@@ -82,8 +19,8 @@ console.log(pending,"pending")
       </div>
       </div>
       <div className="px-6">
-      {activeTab === 0 && <div>{loading ? <Loader /> : <UserRequest users={pendingUsers} onDataChange={handleDataChange}/> }</div>}
-      {activeTab === 1 && <div>{loading ? <Loader /> : <AllUser users={approvedUsers}  /> }</div>}
+      {activeTab === 0 && <div> <UserRequest /> </div>}
+      {activeTab === 1 && <div><AllUser /> </div>}
       </div>
     </div>
    </div>

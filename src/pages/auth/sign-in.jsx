@@ -46,11 +46,16 @@ export function SignIn() {
       }
     } catch (error) {
       console.error('Error during login:', error);
-      toast.error('Invalid email or password.');
+      if (error.response && error.response.status === 401) {
+        toast.error('Invalid email or password');
+      } else {
+        toast.error('An error occurred while logging in');
+      }
     } finally {
       setLoading(false);
     }
-  };
+};
+
 
   const validateEmail = (email) => {
     // eslint-disable-next-line no-useless-escape
