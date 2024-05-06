@@ -35,10 +35,11 @@ function GetSupplier() {
                 Authorization: `Bearer ${token}`
               }
             });
+            const sortedData = response.data.data.data.sort((a, b) => a.ordering_index - b.ordering_index);
             setApiResponse(response.data.data);
-            setSupplierData(response.data.data.data);
+            setSupplierData(sortedData);
             setTotalPages(Math.ceil(response.data.data.total / limitPerPage));
-            console.log("xyz", response.data.data)
+            console.log("xyz", sortedData)
           } else {
             navigate('/sign-in');
             window.alert('Token is not valid. Please sign in first.');
