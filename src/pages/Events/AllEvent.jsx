@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FaStar } from "react-icons/fa";;
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Loader from '../Loader';
 import { useNavigate } from 'react-router-dom';
+import JoditEditor from 'jodit-react';
 
 function AllEvent() {
   const [apiResponse, setApiResponse] = useState(null);
@@ -24,6 +25,26 @@ function AllEvent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); 
   const navigate = useNavigate();
+  const editor = useRef(null);
+
+  const config = {
+    readonly: false,
+    enableDragAndDropFileToEditor: true,
+    uploader: {
+      url: "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent",
+      format: 'multipart',
+      imagesExtensions: ['jpg', 'png', 'jpeg', 'gif'],
+      insertImageAsBase64URI: true,
+      success: (response) => {
+        return {
+          files: [response.result.link] 
+        };
+      },
+      error: (response) => {
+        console.error("Image upload error:", response);
+      }
+    }
+  };
 
     const limitPerPage = 4;
 
@@ -191,6 +212,10 @@ const handlePageClick = (pageNumber) => {
     }
   };
 
+  function renderTextContent(content) {
+    return { __html: content };
+  }
+  
 
 
   return (
@@ -204,7 +229,7 @@ const handlePageClick = (pageNumber) => {
             </div>
             <div className="p-6 py-0 px-1">
             <div className='flex items-center justify-between'><div className="block antialiased tracking-normal font-sans text-sm font-semibold leading-snug text-blue-gray-900 mt-1">Title: <span className='font-normal'>{event.title}</span></div><FaStar className={`${event.isFeatured ? 'text-red-500' : 'text-gray-500'}`} /></div>
-              <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Description: <span className='font-normal'>{event.content}</span></p>
+              <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Description: <span className='font-normal' dangerouslySetInnerHTML={renderTextContent(event.content)} /></p>
               <p className="block antialiased font-sans text-sm leading-normal font-semibold text-blue-gray-900">Type: <span className='font-normal'>{event.type}</span></p>
             <div className='text-sm font-semibold text-blue-gray-900 '>Date: <span className='font-normal'>{new Date(event.published_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</span></div>
             </div>
@@ -245,7 +270,14 @@ const handlePageClick = (pageNumber) => {
               </div>
               <div className="mb-4">
                 <label htmlFor="content" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News and Event Content</label>
-                <textarea value={formData.content} onChange={handleChange} placeholder='News and Event Content...' type="text" id="content" name="content" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+                {/* <textarea value={formData.content} onChange={handleChange} placeholder='News and Event Content...' type="text" id="content" name="content" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required /> */}
+                <JoditEditor
+                  ref={editor}
+                  value={formData.content}
+                  config={config}
+                  tabIndex={1}
+                  onBlur={newContent => setFormData({ ...formData, content: newContent })}
+                />
               </div>
               <div className="mb-4">
                 <label htmlFor="published_date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published Date</label>

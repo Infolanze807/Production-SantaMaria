@@ -113,7 +113,7 @@ function AddComponent() {
           <div className=''>
             <button type="submit" className="text-white bg-[--second-color] font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center" disabled={loading}>{loading ? 'Submitting...' : 'Submit'}</button>
             {error && <div className="text-red-600">{error}</div>}
-          </div>
+          </div>Additionally, there's a growing emphasis on sustainability and social responsibility, shaping how businesses operate and individuals engage with global challenges.
         </form>
       </div>
     </div>

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import JoditEditor from 'jodit-react';
 
 function AddEvent() {
   const [eventTitle, setEventTitle] = useState('');
@@ -15,6 +16,27 @@ function AddEvent() {
   const [token, setToken] = useState('');
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const editor = useRef(null);
+
+  const config = {
+    readonly: false,
+    enableDragAndDropFileToEditor: true,
+    uploader: {
+      url: "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent",
+      format: 'multipart',
+      imagesExtensions: ['jpg', 'png', 'jpeg', 'gif'],
+      insertImageAsBase64URI: true,
+      success: (response) => {
+        return {
+          files: [response.result.link] 
+        };
+      },
+      error: (response) => {
+        console.error("Image upload error:", response);
+      }
+    }
+  };
+  
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
@@ -37,10 +59,10 @@ function AddEvent() {
       formData.append('published_date', eventDate);
       formData.append('image', eventImage);
       formData.append('isFeatured', isFeatured);
-  
+
       console.log(eventType)
       console.log("FormData:", Object.fromEntries(formData));
-      
+
       const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/admin/newsandevent`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -86,10 +108,20 @@ function AddEvent() {
             <option value="Event">Event</option>
             <option value="News">News</option>
           </select>
-        </div>  
-        <div className="mb-5">
+        </div>
+        {/* <div className="mb-5">
           <label htmlFor="eventContent" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Description</label>
           <textarea placeholder='News & Event Description...' id="eventContent" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value={eventContent} onChange={(e) => setEventContent(e.target.value)} required />
+        </div> */}
+        <div className="mb-5">
+          <label htmlFor="eventContent" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Description</label>
+          <JoditEditor
+            ref={editor}
+            value={eventContent}
+            config={config}
+            tabIndex={1}
+            onBlur={newContent => setEventContent(newContent)}
+          />
         </div>
         <div className="mb-5">
           <label htmlFor="eventDate" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Date</label>
