@@ -8,6 +8,11 @@ export function Events() {
   const handleTabClick = (index) => {
     setActiveTab(index);
   };
+
+  const switchToAllEventsTab = () => {
+    setActiveTab(1);
+  };
+  
   return (
     <>
       <div className="">
@@ -19,7 +24,7 @@ export function Events() {
       </div>
       </div>
       <div className="px-6">
-      {activeTab === 0 && <div><AddEvent /></div>}
+      {activeTab === 0 && <div><AddEvent onSuccess={switchToAllEventsTab} /></div>}
       {activeTab === 1 && <div><AllEvent /></div>}
       </div>
     </div>

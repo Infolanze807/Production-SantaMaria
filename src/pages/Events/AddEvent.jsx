@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import JoditEditor from 'jodit-react';
 
-function AddEvent() {
+function AddEvent({ onSuccess }) {
   const [eventTitle, setEventTitle] = useState('');
   const [eventType, setEventType] = useState('Event');
   const [eventContent, setEventContent] = useState('');
@@ -20,7 +20,7 @@ function AddEvent() {
 
   const config = {
     readonly: false,
-    enableDragAndDropFileToEditor: true,
+    enableDragAndDropFileToEditor: false,
     uploader: {
       url: "http://ec2-16-170-165-104.eu-north-1.compute.amazonaws.com:5000/api/admin/newsandevent",
       format: 'multipart',
@@ -78,6 +78,7 @@ function AddEvent() {
         setIsFeatured(false);
         setError('');
         toast.success('News or Event added successfully.');
+        onSuccess();
       }
       console.log(response.data);
     } catch (error) {
@@ -122,6 +123,7 @@ function AddEvent() {
             tabIndex={1}
             onBlur={newContent => setEventContent(newContent)}
           />
+          <div className='text-xs text-red-500 text-end'>Note: Ensure uploaded images are under 700KB for optimal performance.</div>
         </div>
         <div className="mb-5">
           <label htmlFor="eventDate" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">News & Event Date</label>

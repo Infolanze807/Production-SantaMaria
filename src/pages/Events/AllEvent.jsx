@@ -46,7 +46,7 @@ function AllEvent() {
     }
   };
 
-    const limitPerPage = 4;
+    const limitPerPage = 3;
 
   // const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=5&page=1`
   const URL = `${process.env.REACT_APP_API_URL}/api/admin/newsandevent?limit=${limitPerPage}&page=${currentPage}`;
@@ -221,7 +221,7 @@ const handlePageClick = (pageNumber) => {
   return (
     <div className='pb-7'>
     {loading ? <Loader /> : 
-      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-3">
         {eventData.map(event => (
           <div key={event.id.encryptedData} className="relative flex flex-col border border-blue-gray-50 shadow-md p-3 bg-clip-border rounded-xl bg-[--main-color] text-gray-700">
             <div className="relative bg-clip-border rounded-xl overflow-hidden bg-gray-900 text-white shadow-gray-900/20 shadow-lg mx-0 mt-0 mb-4 h-64 xl:h-40">
@@ -278,6 +278,7 @@ const handlePageClick = (pageNumber) => {
                   tabIndex={1}
                   onBlur={newContent => setFormData({ ...formData, content: newContent })}
                 />
+                <div className='text-xs text-red-500 text-end'>Note: Ensure uploaded images are under 700KB for optimal performance.</div>
               </div>
               <div className="mb-4">
                 <label htmlFor="published_date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Published Date</label>
