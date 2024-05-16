@@ -243,7 +243,7 @@ function GetCompany() {
             ))}
             </div>
             }
-            <div className='text-center pb-7 pt-2'>
+            {apiResponse ? <div className='text-center pb-7 pt-2'>
                 <button onClick={handlePrevious} disabled={!apiResponse || !apiResponse.previous || currentPage === 1} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.previous || currentPage === 1 ? 'opacity-50 cursor-not-allowed' : ''}`}>Previous</button>
                 {Array.from({ length: Math.min(totalPages, 3) }, (_, index) => currentPage - 1 + index).map(pageNumber => (
                     pageNumber > 0 && pageNumber <= totalPages && (
@@ -251,7 +251,7 @@ function GetCompany() {
                     )
                 ))}
                 <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
-            </div>
+            </div> : "" }
 
             {selectedCompany && (
                 <div className="fixed p-3 inset-0 flex justify-center items-start bg-black bg-opacity-50 z-50 overflow-y-auto">
