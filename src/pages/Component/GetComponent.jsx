@@ -14,7 +14,8 @@ function GetComponent() {
     description: '',
     profile_image: null,
     cover_image: null,
-    icon: null
+    icon: null,
+    type: ''
   });
   const [error, setError] = useState('');
   const [deleteLoadingId, setDeleteLoadingId] = useState(null);
@@ -88,6 +89,7 @@ const handlePageClick = (pageNumber) => {
     setFormData({
       name: component.name,
       description: component.description,
+      type: component.type,
       // profile_image: component.profile_image,
       // cover_image: component.cover_image,
       // icon: component.icon
@@ -193,6 +195,14 @@ const handlePageClick = (pageNumber) => {
     }
   };
 
+  function getFilenameFromUrl(url) {
+    const parts = url.split('/');
+    const filename = parts.pop();
+    return filename;
+  }
+
+
+
   return (
     <div className='pb-7'>
     {loading ? <Loader /> : 
@@ -210,6 +220,7 @@ const handlePageClick = (pageNumber) => {
             <div className="p-6 py-0 px-1 pt-5">
               <p className="block antialiased font-sans text-sm text-gray-900 font-semibold">Name: &nbsp;<span className='font-normal'>{component.name}</span></p>
               <div className='text-sm pt-1 text-gray-900 font-semibold'>Description: &nbsp;<span className='font-normal'>{component.description}</span></div>
+              <p className="block pt-1 antialiased font-sans text-sm text-gray-900 font-semibold">Type: &nbsp;<span className='font-normal'>{component.type}</span></p>
           <div className='flex items-center text-sm text-gray-900 font-semibold pt-1'>Icon: &nbsp;<img className='object-cover rounded-full w-8 h-8' src={component.icon} alt="icon" /></div>
             </div>
             <div className="p-6 mt-6 flex items-center justify-between py-0 px-1">
@@ -230,7 +241,7 @@ const handlePageClick = (pageNumber) => {
                 <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
       {selectedComponent && (
-        <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+        <div className="fixed p-3 inset-0 flex justify-center items-start bg-black bg-opacity-50 z-50 overflow-y-auto">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Update Component</h2>
             <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
@@ -243,15 +254,19 @@ const handlePageClick = (pageNumber) => {
                 <textarea value={formData.description} onChange={handleChange} placeholder='Description...' type="text" id="description" name="description" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
               </div>
               <div className="mb-4">
-                <label htmlFor="profile_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Image</label>
+                <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Component Type</label>
+                <input value={formData.type} onChange={handleChange} type="text" id="type" name="type" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Component Name..." required />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="profile_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Image: {formData.profile_image ? "" : getFilenameFromUrl(selectedComponent.profile_image)}</label>
                 <input onChange={handleChange} type="file" id="profile_image" name="profile_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="mb-4">
-                <label htmlFor="cover_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cover Image</label>
+                <label htmlFor="cover_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cover Image: {formData.cover_image ? "" : getFilenameFromUrl(selectedComponent.cover_image)}</label>
                 <input onChange={handleChange} type="file" id="cover_image" name="cover_image" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="mb-4">
-                <label htmlFor="icon" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Icon File</label>
+                <label htmlFor="icon" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Icon File: {formData.icon ? "" : getFilenameFromUrl(selectedComponent.icon)}</label>
                 <input onChange={handleChange} type="file" id="icon" name="icon" accept="image/*" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
               </div>
               <div className="flex items-center justify-end space-x-4">

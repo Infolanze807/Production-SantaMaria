@@ -10,7 +10,8 @@ function AddComponent() {
     description: '',
     profile_image: null,
     cover_image: null,
-    icon: null
+    icon: null,
+    type: ''
   });
   const [error, setError] = useState('');
   const [token, setToken] = useState('');
@@ -42,6 +43,7 @@ function AddComponent() {
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
       formDataToSend.append('description', formData.description);
+      formDataToSend.append('type', formData.type);
       formDataToSend.append('profile_image', formData.profile_image);
       formDataToSend.append('cover_image', formData.cover_image);
       formDataToSend.append('icon', formData.icon);
@@ -60,7 +62,8 @@ function AddComponent() {
           description: '',
           profile_image: null,
           cover_image: null,
-          icon: null
+          icon: null,
+          type: ''
         });
      
         // Optionally, alert the user
@@ -97,6 +100,10 @@ function AddComponent() {
           <div className="mb-5">
             <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Component Description</label>
             <textarea value={formData.description} onChange={handleChange} placeholder='Component Description...' type="text" id="description" name="description" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
+          </div>
+          <div className="mb-5">
+            <label htmlFor="type" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Component Type</label>
+            <input type="text" id="type" name="type" value={formData.type} onChange={handleChange} className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Component Name..." required />
           </div>
           <div className='mb-5'>
             <label htmlFor="profile_image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Profile Image</label>

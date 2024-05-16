@@ -193,6 +193,11 @@ const handleSubmit = async (e) => {
     }
   };
 
+  function getFilenameFromUrl(url) {
+    const parts = url.split('/');
+    const filename = parts.pop();
+    return filename;
+  }
 
 
     return (
@@ -226,7 +231,7 @@ const handleSubmit = async (e) => {
                 <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
             </div>
             {selectedBanner && (
-                <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+                <div className="fixed p-3 inset-0 flex justify-center items-start bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
                         <h2 className="text-2xl font-bold mb-4">Update Banner</h2>
                         <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
@@ -239,7 +244,7 @@ const handleSubmit = async (e) => {
                                 <textarea value={formData.description} onChange={handleChange} placeholder='Description...' type="text" id="description" name="description" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                             </div>
                             <div className="mb-4">
-                                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image</label>
+                                <label htmlFor="image" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Image: {formData.image ? "" : getFilenameFromUrl(selectedBanner.image)}</label>
                                 <input onChange={handleChange} type="file" id="image" name="image" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" />
                             </div>
                             <div className="flex items-center justify-end space-x-4">

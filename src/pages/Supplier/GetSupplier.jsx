@@ -12,7 +12,8 @@ function GetSupplier() {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        contact_no: ''
+        contact_no: '',
+        ordering_index: ''
     });
     const [error, setError] = useState('');
     const [deleteLoadingId, setDeleteLoadingId] = useState(null);
@@ -85,6 +86,7 @@ function GetSupplier() {
                 name: supplier.name,
                 description: supplier.description,
                 contact_no: supplier.contact_no,
+                ordering_index: supplier.ordering_index
             });
         };
 
@@ -198,33 +200,39 @@ function GetSupplier() {
                   setLoadingUpdate(false);
                 }
               };
+
+              function getFilenameFromUrl(url) {
+                const parts = url.split('/');
+                const filename = parts.pop();
+                return filename;
+              }
       
    
   return (
     <div>
       {loading ? <Loader /> :
       <div>
-        {supplierData.map(supplier => (
-                <div key={supplier.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
-                    <div className='col-span-2 relative'>
-                        <div className='pt-11 lg:w-72'>
-                            <img className='-z-10 w-full object-cover rounded-lg' src={supplier.cover_image} alt="" />
-                        </div>
-                        <div className=''>
-                            <img className='absolute border-4 border-white w-24 h-24 rounded-full object-cover left-6 top-0' src={supplier.profile_image} alt="" />
-                        </div>
-                    </div>
-                    <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
-                        <div>Name: &nbsp;<span className='font-normal'>{supplier.name}</span></div>
-                        <div>Description: &nbsp;<span className='font-normal'>{supplier.description}</span></div>
-                        <div>Number: &nbsp;<span className='font-normal'>{supplier.contact_no}</span></div>
-                    </div>
-                    <div className='lg:flex lg:flex-col mx-auto gap-2 pt-4 lg:pt-0'>
-                        <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(supplier)}>View</button>
-                        <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" disabled={deleteLoadingId === supplier.id} onClick={() => handleDeleteClick(supplier.id)}>{deleteLoadingId === supplier.id ? 'Deleting...' : 'Delete'}</button>
-                    </div>
-                </div>
-            ))}
+          {supplierData.map(supplier => (
+                  <div key={supplier.id.encryptedData} className="grid lg:grid-cols-6 grid-cols-1 items-center border rounded-lg p-5 bg-[--main-color] mb-5">
+                      <div className='col-span-2 relative'>
+                          <div className='pt-11 lg:w-72'>
+                              <img className='-z-10 w-full object-cover rounded-lg' src={supplier.cover_image} alt="" />
+                          </div>
+                          <div className=''>
+                              <img className='absolute border-4 border-white w-24 h-24 rounded-full object-cover left-6 top-0' src={supplier.profile_image} alt="" />
+                          </div>
+                      </div>
+                      <div className='col-span-3 text-gray-900 font-semibold text-sm leading-relaxed pt-5 lg:pt-0'>
+                          <div>Name: &nbsp;<span className='font-normal'>{supplier.name}</span></div>
+                          <div>Description: &nbsp;<span className='font-normal'>{supplier.description}</span></div>
+                          <div>Number: &nbsp;<span className='font-normal'>{supplier.contact_no}</span></div>
+                      </div>
+                      <div className='lg:flex lg:flex-col mx-auto gap-2 pt-4 lg:pt-0'>
+                          <button className="bg-green-500 px-8 w-max p-2 text-sm rounded-full text-white lg:me-5 lg:mb-0 mb-3" onClick={() => handleViewClick(supplier)}>View</button>
+                          <button className="bg-red-500 px-7 p-2 w-max text-sm rounded-full text-white" disabled={deleteLoadingId === supplier.id} onClick={() => handleDeleteClick(supplier.id)}>{deleteLoadingId === supplier.id ? 'Deleting...' : 'Delete'}</button>
+                      </div>
+                  </div>
+              ))}
              </div>
             }
              <div className='text-center pb-7 pt-2'>
@@ -238,7 +246,7 @@ function GetSupplier() {
             </div>
 
             {selectedSupplier && (
-                <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+                <div className="fixed p-3 inset-0 flex justify-center items-start bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
                         <h2 className="text-2xl font-bold mb-4">Update Supplier</h2>
                         <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
@@ -254,12 +262,16 @@ function GetSupplier() {
                                 <label htmlFor="contact_no" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Contact Number</label>
                                 <input value={formData.contact_no} onChange={handleChange} placeholder='Number...' type="tel" id="contact_no" name="contact_no" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                             </div>
+                            <div className="mb-4">
+                                <label htmlFor="ordering_index" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Supplier Order Index</label>
+                                <input value={formData.ordering_index} onChange={handleChange} type="text" id="ordering_index" name="ordering_index" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Supplier Index..." />
+                            </div>
                             <div className='mb-4'>
-                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="profile_img">Profile Image</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="profile_img">Profile Image: {formData.profile_image ? "" : getFilenameFromUrl(selectedSupplier.profile_image)}</label>
                                 <input onChange={handleChange} name='profile_image' className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
                             </div>
                             <div className='mb-4'>
-                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="cover_img">Cover Image</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="cover_img">Cover Image: {formData.cover_image ? "" : getFilenameFromUrl(selectedSupplier.cover_image)}</label>
                                 <input onChange={handleChange} name='cover_image' className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
                             </div>
                             

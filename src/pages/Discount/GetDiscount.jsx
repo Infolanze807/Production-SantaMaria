@@ -84,7 +84,6 @@ const handlePageClick = (pageNumber) => {
 
 
   const handleEditClick = (discount) => {
-    console.log(discount)
     const companyIdBase64 = btoa(JSON.stringify({
       "iv": discount.company.id.iv,
       "encryptedData": discount.company.id.encryptedData,
@@ -209,6 +208,12 @@ const handlePageClick = (pageNumber) => {
       console.log("Deletion cancelled");
     }
   };
+
+  function getFilenameFromUrl(url) {
+    const parts = url.split('/');
+    const filename = parts.pop();
+    return filename;
+  }
   
 
 
@@ -245,7 +250,7 @@ const handlePageClick = (pageNumber) => {
                 <button onClick={handleNext} disabled={!apiResponse || !apiResponse.next || currentPage === totalPages} className={`bg-[#2d2d2d] rounded-md px-5 p-2 text-sm text-white mx-2 w-24 ${!apiResponse || !apiResponse.next || currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : ''}`}>Next</button>
       </div>
       {isModalOpen && (
-        <div className="fixed inset-0 p-3 flex justify-center items-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 p-3 flex justify-center items-start bg-black bg-opacity-50 z-50">
           <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
             <h2 className="text-2xl font-bold mb-4">Update Discount</h2>
             <form class="max-w-xl mx-auto" onSubmit={handleSubmit}>
@@ -258,11 +263,11 @@ const handlePageClick = (pageNumber) => {
             <input readonly value={formData.companyId}  name='companyId' placeholder='Lorem ipsum dolor sit...' type="text" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         </div>
         <div class="mb-5">
-            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Validity Date</label>
+            <label for="text" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Validity Date: {formData.valid_till ? "" : new Date(is.valid_till).toLocaleDateString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric' })}</label>
             <input value={formData.valid_till} onChange={handleChange} name='valid_till' placeholder='Date...' type="date" id="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
         </div>
         <div className='mb-5'>
-        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">Upload Image</label>
+        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">Upload Image: {formData.image ? "" : getFilenameFromUrl(isModalOpen.image)}</label>
         <input onChange={handleChange} name='image' class="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
         </div>
             <div className="flex justify-between mt-4">

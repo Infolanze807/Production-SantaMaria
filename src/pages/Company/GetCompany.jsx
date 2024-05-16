@@ -206,6 +206,12 @@ function GetCompany() {
         }
       };
 
+      function getFilenameFromUrl(url) {
+        const parts = url.split('/');
+        const filename = parts.pop();
+        return filename;
+      }
+
  
 
     return (
@@ -248,7 +254,7 @@ function GetCompany() {
             </div>
 
             {selectedCompany && (
-                <div className="fixed p-3 inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50 overflow-y-auto">
+                <div className="fixed p-3 inset-0 flex justify-center items-start bg-black bg-opacity-50 z-50 overflow-y-auto">
                     <div className="bg-white w-[600px] max-w-2xl p-6 rounded-lg">
                         <h2 className="text-2xl font-bold mb-4">Update Company</h2>
                         <form className="max-w-xl mx-auto" onSubmit={handleSubmit}>
@@ -273,11 +279,11 @@ function GetCompany() {
                                 <input value={formData.location} onChange={handleChange} placeholder='Location...' type="text" id="location" name="location" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                             </div>
                             <div className='mb-4'>
-                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="profile_img">Profile Image</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="profile_img">Profile Image: {formData.profile_image ? "" : getFilenameFromUrl(selectedCompany.profile_image)}</label>
                                 <input onChange={handleChange} name='profile_image' className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
                             </div>
                             <div className='mb-4'>
-                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="cover_img">Cover Image</label>
+                                <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="cover_img">Cover Image: {formData.cover_image ? "" : getFilenameFromUrl(selectedCompany.cover_image)}</label>
                                 <input onChange={handleChange} name='cover_image' className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-white dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="user_avatar_help" id="user_avatar" type="file" />
                             </div>
                             <div className="flex items-center justify-end space-x-4">
